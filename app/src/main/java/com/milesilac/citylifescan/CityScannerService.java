@@ -6,18 +6,25 @@ import android.widget.Toast;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.ImageLoader;
+import com.android.volley.toolbox.ImageRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.NetworkImageView;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class CityScannerService {
 
-    public static final String QUERY_FOR_CITY_NAME = "https://api.teleport.org/api/cities/?search=";
+    public static final String QUERY_FOR_CITY_NAME = "https://api.teleport.org/api/urban_areas/slug:";
+    public static final String QUERY_FOR_CITY_IMAGE = "/images/";
 
     Context context;
-    String test2;
+//    String test2;
 
     public CityScannerService(Context context) {
         this.context = context;
@@ -26,44 +33,93 @@ public class CityScannerService {
     public interface VolleyResponseListener {
         void onError(String message);
 
-        void onResponse(String test2);
+        void onResponse(String test1);
     }
 
-    public void getScanResults(String cityName, VolleyResponseListener volleyResponseListener) {
+    //provide image on button click
+    public void getScanResultsImage(String cityName, VolleyResponseListener volleyResponseListener) {
         if (cityName.contains(" ")) {
-            cityName = cityName.replace(" ","%20");
+            cityName = cityName.replace(" ","-");
         }
-        String url = QUERY_FOR_CITY_NAME + cityName;
+        String url = QUERY_FOR_CITY_NAME + cityName + QUERY_FOR_CITY_IMAGE;
 
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url, null ,new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
-                test2 = "";
-                JSONObject test3;
-                JSONArray test4;
+                JSONArray photos;
+                JSONObject image;
+                String imageMobile = "";
 
                 try {
-                    JSONObject test1 = response.getJSONObject("_embedded");
-                    test4 = test1.getJSONArray("city:search-results");
-                    test3 = test4.getJSONObject(0);
-                    test2 = test3.getString("matching_full_name");
+                    photos = response.getJSONArray("photos");
+                    JSONObject getImage = photos.getJSONObject(0);
+                    image = getImage.getJSONObject("image");
+                    imageMobile = image.getString("mobile");
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
 
-//                Toast.makeText(context, "Matched Full Name: " + test2, Toast.LENGTH_LONG).show();
-                volleyResponseListener.onResponse(test2);
+                String imgUrl = imageMobile;
+
+                volleyResponseListener.onResponse(imgUrl);
+
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-//                Toast.makeText(context, "Error", Toast.LENGTH_LONG).show();
-                volleyResponseListener.onError("Still error");
+                volleyResponseListener.onError("Image not uploaded");
+            }
+        }); // jsonObjectRequest inner class
+
+        MySingleton.getInstance(context).addToRequestQueue(jsonObjectRequest);
+
+
+
+    }
+
+
+    //provide all data on button click
+    public void getScanResultsData(String cityName, VolleyResponseListener volleyResponseListener) {
+        if (cityName.contains(" ")) {
+            cityName = cityName.replace(" ","-");
+        }
+        String url = QUERY_FOR_CITY_NAME + cityName + "/";
+
+
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url, null ,new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                String fullName = "";
+                String continent = "";
+                String currentMayor = "";
+
+
+                try {
+                    fullName = response.getString("full_name");
+                    continent = response.getString("continent");
+                    currentMayor = response.getString("mayor");
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+                String testOutput = "Full name: " + fullName + "\n" +
+                                    "Continent name: " + continent + "\n" +
+                                    "Current Mayor: " + currentMayor;
+
+                volleyResponseListener.onResponse(testOutput);
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                volleyResponseListener.onError("Not a Teleport City yet");
             }
         }); // jsonObjectRequest inner class
 
 
         MySingleton.getInstance(context).addToRequestQueue(jsonObjectRequest);
 
+
     }
+
+
 }

@@ -12,7 +12,7 @@
         android:layout_height="wrap_content"
         android:ems="10"
         android:inputType="textPersonName"
-        android:hint="City/Country"
+        android:hint="Teleport City/Country"
         app:layout_constraintBottom_toTopOf="@+id/toolbar"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
@@ -40,14 +40,26 @@
 
     </androidx.appcompat.widget.Toolbar>
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/resultsRecView"
-        android:layout_width="409dp"
-        android:layout_height="465dp"
-        app:layout_constraintBottom_toTopOf="@+id/inputCity"
+    <com.android.volley.toolbox.NetworkImageView
+        android:id="@+id/photo"
+        android:layout_width="250dp"
+        android:layout_height="250dp"
+        android:adjustViewBounds="true"
+        android:scaleType="fitCenter"
+        app:layout_constraintBottom_toTopOf="@+id/outputData"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/outputData"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:hint="Output Here"
+        app:layout_constraintTop_toBottomOf="@+id/photo"
+        app:layout_constraintBottom_toTopOf="@+id/inputCity"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
 
 
 

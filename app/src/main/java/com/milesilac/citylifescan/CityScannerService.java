@@ -22,9 +22,10 @@ public class CityScannerService {
 
     public static final String QUERY_FOR_CITY_NAME = "https://api.teleport.org/api/urban_areas/slug:";
     public static final String QUERY_FOR_CITY_IMAGE = "/images/";
+    public static final String QUERY_FOR_CITY_SCORES = "/scores/";
+    public static final String QUERY_FOR_CITY_DETAILS = "/details/";
 
     Context context;
-//    String test2;
 
     public CityScannerService(Context context) {
         this.context = context;
@@ -36,8 +37,21 @@ public class CityScannerService {
         void onResponse(String test1);
     }
 
+    public interface VolleyArrayResponseListener {
+        void onError(String message);
+
+        void onResponse(JSONArray jsonArray);
+    }
+
+    public interface VolleyScoreResponseListener {
+        void onError(String message);
+
+        void onResponse(String score, String summary, String scoreVerbose);
+    }
+
     //provide image on button click
     public void getScanResultsImage(String cityName, VolleyResponseListener volleyResponseListener) {
+        cityName = cityName.toLowerCase();
         if (cityName.contains(" ")) {
             cityName = cityName.replace(" ","-");
         }
@@ -73,18 +87,16 @@ public class CityScannerService {
 
         MySingleton.getInstance(context).addToRequestQueue(jsonObjectRequest);
 
+    } //getScanResultsImage
 
 
-    }
-
-
-    //provide all data on button click
-    public void getScanResultsData(String cityName, VolleyResponseListener volleyResponseListener) {
+    //provide basic info on button click
+    public void getScanResultsBasicInfo(String cityName, VolleyResponseListener volleyResponseListener) {
+        cityName = cityName.toLowerCase();
         if (cityName.contains(" ")) {
             cityName = cityName.replace(" ","-");
         }
         String url = QUERY_FOR_CITY_NAME + cityName + "/";
-
 
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url, null ,new Response.Listener<JSONObject>() {
             @Override
@@ -104,7 +116,8 @@ public class CityScannerService {
 
                 String testOutput = "Full name: " + fullName + "\n" +
                                     "Continent name: " + continent + "\n" +
-                                    "Current Mayor: " + currentMayor;
+                                    "Current Mayor: " + currentMayor + "\n";
+
 
                 volleyResponseListener.onResponse(testOutput);
             }
@@ -118,8 +131,89 @@ public class CityScannerService {
 
         MySingleton.getInstance(context).addToRequestQueue(jsonObjectRequest);
 
+    } //getScanResultsBasicInfo
 
-    }
+    //provide basic CoL on button click
+    public void getScanResultsScores(String cityName, VolleyScoreResponseListener volleyScoreResponseListener) {
+        cityName = cityName.toLowerCase();
+        if (cityName.contains(" ")) {
+            cityName = cityName.replace(" ","-");
+        }
+        String url = QUERY_FOR_CITY_NAME + cityName + QUERY_FOR_CITY_SCORES;
+
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url, null ,new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                double teleport_city_score = 0;
+                String summary = "";
+                JSONArray categories = null;
+
+
+
+                try {
+                    teleport_city_score = response.getDouble("teleport_city_score");
+                    summary = response.getString("summary");
+                    categories = response.getJSONArray("categories");
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+                String scoreResult = "Teleport City Score: " + teleport_city_score + "\n";
+                String summaryResult = "Summary: " + summary + "\n";
+                String scoreVerboseResult = "Scores: " + categories.toString();
+
+                volleyScoreResponseListener.onResponse(scoreResult,summaryResult,scoreVerboseResult);
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                volleyScoreResponseListener.onError("Not a Teleport City yet");
+            }
+        }); // jsonObjectRequest inner class
+
+
+        MySingleton.getInstance(context).addToRequestQueue(jsonObjectRequest);
+
+    } //getScanResultsScores
+
+    //provide basic CoL on button click
+    public void getScanResultsCostOfLiving(String cityName, VolleyArrayResponseListener volleyArrayResponseListener) {
+        cityName = cityName.toLowerCase();
+        if (cityName.contains(" ")) {
+            cityName = cityName.replace(" ","-");
+        }
+        String url = QUERY_FOR_CITY_NAME + cityName + QUERY_FOR_CITY_DETAILS;
+
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url, null ,new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                JSONArray categories;
+                JSONObject getCostOfLiving;
+                JSONArray costOfLiving = null;
+
+
+                try {
+                    categories = response.getJSONArray("categories");
+                    getCostOfLiving = categories.getJSONObject(3);
+                    costOfLiving = getCostOfLiving.getJSONArray("data");
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+
+                volleyArrayResponseListener.onResponse(costOfLiving);
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                volleyArrayResponseListener.onError("Not a Teleport City yet");
+            }
+        }); // jsonObjectRequest inner class
+
+
+        MySingleton.getInstance(context).addToRequestQueue(jsonObjectRequest);
+
+    } //getScanResultsCostOfLiving
 
 
 }

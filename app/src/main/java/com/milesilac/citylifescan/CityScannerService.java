@@ -46,7 +46,7 @@ public class CityScannerService {
     public interface VolleyScoreResponseListener {
         void onError(String message);
 
-        void onResponse(String score, String summary, String scoreVerbose);
+        void onResponse(String score, String summary, ArrayList<CityScore> cityScore);
     }
 
     //provide image on button click
@@ -133,7 +133,8 @@ public class CityScannerService {
 
     } //getScanResultsBasicInfo
 
-    //provide basic CoL on button click
+
+    //provide Scores on button click
     public void getScanResultsScores(String cityName, VolleyScoreResponseListener volleyScoreResponseListener) {
         cityName = cityName.toLowerCase();
         if (cityName.contains(" ")) {
@@ -146,7 +147,9 @@ public class CityScannerService {
             public void onResponse(JSONObject response) {
                 double teleport_city_score = 0;
                 String summary = "";
-                JSONArray categories = null;
+                JSONArray categories;
+                JSONObject scoresVerbose;
+                ArrayList<CityScore> scores = new ArrayList<>();
 
 
 
@@ -154,15 +157,21 @@ public class CityScannerService {
                     teleport_city_score = response.getDouble("teleport_city_score");
                     summary = response.getString("summary");
                     categories = response.getJSONArray("categories");
+                    for (int i=0;i<categories.length();i++) {
+                        scoresVerbose = categories.getJSONObject(i);
+                        scores.add(new CityScore(scoresVerbose.getString("name")
+                                    ,scoresVerbose.getInt("score_out_of_10")
+                                    ,scoresVerbose.getString("color")));
+                    }
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
 
                 String scoreResult = "Teleport City Score: " + teleport_city_score + "\n";
-                String summaryResult = "Summary: " + summary + "\n";
-                String scoreVerboseResult = "Scores: " + categories.toString();
+                String summaryResult = "Summary: " + summary;
 
-                volleyScoreResponseListener.onResponse(scoreResult,summaryResult,scoreVerboseResult);
+
+                volleyScoreResponseListener.onResponse(scoreResult,summaryResult,scores);
             }
         }, new Response.ErrorListener() {
             @Override
@@ -175,45 +184,5 @@ public class CityScannerService {
         MySingleton.getInstance(context).addToRequestQueue(jsonObjectRequest);
 
     } //getScanResultsScores
-
-    //provide basic CoL on button click
-    public void getScanResultsCostOfLiving(String cityName, VolleyArrayResponseListener volleyArrayResponseListener) {
-        cityName = cityName.toLowerCase();
-        if (cityName.contains(" ")) {
-            cityName = cityName.replace(" ","-");
-        }
-        String url = QUERY_FOR_CITY_NAME + cityName + QUERY_FOR_CITY_DETAILS;
-
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url, null ,new Response.Listener<JSONObject>() {
-            @Override
-            public void onResponse(JSONObject response) {
-                JSONArray categories;
-                JSONObject getCostOfLiving;
-                JSONArray costOfLiving = null;
-
-
-                try {
-                    categories = response.getJSONArray("categories");
-                    getCostOfLiving = categories.getJSONObject(3);
-                    costOfLiving = getCostOfLiving.getJSONArray("data");
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-
-
-                volleyArrayResponseListener.onResponse(costOfLiving);
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                volleyArrayResponseListener.onError("Not a Teleport City yet");
-            }
-        }); // jsonObjectRequest inner class
-
-
-        MySingleton.getInstance(context).addToRequestQueue(jsonObjectRequest);
-
-    } //getScanResultsCostOfLiving
-
 
 }

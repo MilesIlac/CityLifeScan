@@ -11,10 +11,10 @@
         android:id="@+id/outputScrollView"
         android:layout_width="wrap_content"
         android:layout_height="0dp"
-        app:layout_constraintBottom_toTopOf="@+id/inputCity"
+        app:layout_constraintBottom_toTopOf="@+id/toolbar"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toBottomOf="@+id/inputCity">
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -98,16 +98,17 @@
     </androidx.core.widget.NestedScrollView>
 
 
-    <EditText
+    <AutoCompleteTextView
         android:id="@+id/inputCity"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:ems="10"
-        android:inputType="textPersonName"
         android:hint="Teleport City/Country"
-        app:layout_constraintBottom_toTopOf="@+id/toolbar"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/outputScrollView"
+        android:layout_margin="50dp"/>
+
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"

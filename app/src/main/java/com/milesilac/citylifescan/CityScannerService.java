@@ -20,6 +20,7 @@ public class CityScannerService {
     public static final String QUERY_FOR_ALL_URBAN_AREAS = "https://api.teleport.org/api/urban_areas/";
     public static final String QUERY_FOR_CITY_IMAGE = "/images/";
     public static final String QUERY_FOR_CITY_SCORES = "/scores/";
+    public static final String QUERY_FOR_CITY_SALARIES = "/salaries/";
     public static final String QUERY_FOR_CITY_DETAILS = "/details/";
 
     Context context;
@@ -47,12 +48,27 @@ public class CityScannerService {
         void onResponse(String score, String summary, ArrayList<CityScore> cityScore);
     }
 
+    public interface VolleySalaryResponseListener {
+        void onError(String message);
+
+        void onResponse(ArrayList<CitySalaries> citySalaries);
+    }
+
 
     //provide image on button click
     public void getScanResultsImage(String cityName, VolleyResponseListener volleyResponseListener) {
         cityName = cityName.toLowerCase();
-        if (cityName.contains(" ")) {
+        if (cityName.contains(", ")) {
+            cityName = cityName.replace(", ","-");
+        }
+        else if (cityName.contains(". ")) {
+            cityName = cityName.replace(". ","-");
+        }
+        else if (cityName.contains(" ")) {
             cityName = cityName.replace(" ","-");
+        }
+        if (cityName.contains(".")) {
+            cityName = cityName.replace(".","");
         }
         String url = QUERY_FOR_CITY_NAME + cityName + QUERY_FOR_CITY_IMAGE;
 
@@ -95,9 +111,19 @@ public class CityScannerService {
     //provide basic info on button click
     public void getScanResultsBasicInfo(String cityName, VolleyResponseListener volleyResponseListener) {
         cityName = cityName.toLowerCase();
-        if (cityName.contains(" ")) {
+        if (cityName.contains(", ")) {
+            cityName = cityName.replace(", ","-");
+        }
+        else if (cityName.contains(". ")) {
+            cityName = cityName.replace(". ","-");
+        }
+        else if (cityName.contains(" ")) {
             cityName = cityName.replace(" ","-");
         }
+        if (cityName.contains(".")) {
+            cityName = cityName.replace(".","");
+        }
+
         String url = QUERY_FOR_CITY_NAME + cityName + "/";
 
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url, null ,new Response.Listener<JSONObject>() {
@@ -143,9 +169,19 @@ public class CityScannerService {
     //provide Scores on button click
     public void getScanResultsScores(String cityName, VolleyScoreResponseListener volleyScoreResponseListener) {
         cityName = cityName.toLowerCase();
-        if (cityName.contains(" ")) {
+        if (cityName.contains(", ")) {
+            cityName = cityName.replace(", ","-");
+        }
+        else if (cityName.contains(". ")) {
+            cityName = cityName.replace(". ","-");
+        }
+        else if (cityName.contains(" ")) {
             cityName = cityName.replace(" ","-");
         }
+        if (cityName.contains(".")) {
+            cityName = cityName.replace(".","");
+        }
+
         String url = QUERY_FOR_CITY_NAME + cityName + QUERY_FOR_CITY_SCORES;
 
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url, null ,new Response.Listener<JSONObject>() {
@@ -192,6 +228,77 @@ public class CityScannerService {
         System.out.println("Scores queue start");
 
     } //getScanResultsScores
+
+
+    //provide Salaries on button click
+    public void getScanResultsSalaries(String cityName, VolleySalaryResponseListener volleySalaryResponseListener) {
+        cityName = cityName.toLowerCase();
+        if (cityName.contains(", ")) {
+            cityName = cityName.replace(", ","-");
+        }
+        else if (cityName.contains(". ")) {
+            cityName = cityName.replace(". ","-");
+        }
+        else if (cityName.contains(" ")) {
+            cityName = cityName.replace(" ","-");
+        }
+        if (cityName.contains(".")) {
+            cityName = cityName.replace(".","");
+        }
+
+        String url = QUERY_FOR_CITY_NAME + cityName + QUERY_FOR_CITY_SALARIES;
+
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url, null ,new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                JSONArray salaries;
+                JSONObject getSalaryDetails;
+                JSONObject job;
+                String title;
+                JSONObject salaryPercentiles;
+                double percentile_25;
+                double percentile_50;
+                double percentile_75;
+                ArrayList<CitySalaries> salaryData = new ArrayList<>();
+
+                try {
+                    salaries = response.getJSONArray("salaries");
+                    for (int i=0;i<salaries.length();i++) {
+                        getSalaryDetails = salaries.getJSONObject(i);
+
+                        job = getSalaryDetails.getJSONObject("job");
+                        title = job.getString("title");
+
+                        salaryPercentiles = getSalaryDetails.getJSONObject("salary_percentiles");
+                        percentile_25 = salaryPercentiles.getDouble("percentile_25");
+                        percentile_50 = salaryPercentiles.getDouble("percentile_50");
+                        percentile_75 = salaryPercentiles.getDouble("percentile_75");
+
+                        salaryData.add(new CitySalaries(title,percentile_25,percentile_50,percentile_75));
+                    }
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    System.out.println("Scores stack trace out");
+                }
+
+
+                volleySalaryResponseListener.onResponse(salaryData);
+
+                System.out.println("Salary data request out");
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+            }
+        }); // jsonObjectRequest inner class
+
+
+        MySingleton.getInstance(context).addToRequestQueue(jsonObjectRequest);
+        System.out.println("Scores queue start");
+
+    } //getScanResultsSalaries
+
 
     //city name checker (autocomplete)
     public void checkCityName(VolleyArrayResponseListener volleyArrayResponseListener) {

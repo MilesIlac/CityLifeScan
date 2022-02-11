@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:id="@+id/scoreLayout">
 
-    <TableRow>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
         <TextView
             android:id="@+id/scoreName"
@@ -24,7 +26,19 @@
             android:layout_height="wrap_content"
             style="@style/Widget.AppCompat.ProgressBar.Horizontal"
             android:max="10" />
-    </TableRow>
+    </LinearLayout>
 
+    <LinearLayout
+        android:id="@+id/scoreDetailsTable"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
 
-</TableLayout>
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/scoreDetailsRecView"
+            android:nestedScrollingEnabled="false"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"/>
+    </LinearLayout>
+
+</LinearLayout>

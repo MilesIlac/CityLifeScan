@@ -41,20 +41,19 @@ public class MainActivity extends AppCompatActivity {
     AnyChartView anyChartView;
     Spinner jobSpinner;
 
-    public static final String QUERY_FOR_ALL_URBAN_AREAS_2 = "https://api.teleport.org/api/urban_areas/";
     public static final String SHOW_MEDIAN_SALARY = "MEDIAN SALARY: ";
 
+    public static String getCityNameInput;
+
+//    public static ArrayList<SortCityDetails> sortCityDetails = new ArrayList<>();
+    public static ArrayList<CityScore> sortCityDetails = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        //-- Test Code
-        anyChartView = findViewById(R.id.pyramidChart);
 
-
-        //--
 
         btnScan = findViewById(R.id.btnScan);
         inputCity = findViewById(R.id.inputCity);
@@ -70,16 +69,16 @@ public class MainActivity extends AppCompatActivity {
         scoresCard = findViewById(R.id.scoresCard);
         salaryChartCard = findViewById(R.id.pyramidChartCard);
 
-
         //set default networkImageView
         networkImageView.setDefaultImageResId(R.drawable.ic_launcher_foreground);
 
         //set RecyclerViewAdapter
         ScoreRecViewAdapter scoreRecViewAdapter = new ScoreRecViewAdapter(this);
         scoresRecView.setAdapter(scoreRecViewAdapter);
-        scoresRecView.setLayoutManager(new LinearLayoutManager(MainActivity.this));
+        scoresRecView.setLayoutManager(new LinearLayoutManager(this));
 
-        //set jobSpinner
+        //set AnyChart view
+        anyChartView = findViewById(R.id.pyramidChart);
 
 
         //empty screen on initialization
@@ -93,7 +92,6 @@ public class MainActivity extends AppCompatActivity {
         cityScannerService.checkCityName(new CityScannerService.VolleyArrayResponseListener() {
             @Override
             public void onError(String message) {
-
             }
 
             @Override
@@ -106,15 +104,16 @@ public class MainActivity extends AppCompatActivity {
         }); //checkCityName
 
 
+
         btnScan.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View v) {
-                System.out.println("Button was called");
-                Toast.makeText(MainActivity.this,"Button was called",Toast.LENGTH_LONG).show();
 
-            CityScannerService cityScannerService = new CityScannerService(MainActivity.this);
-            outputBasicInfo.setText("");
+                getCityNameInput = inputCity.getText().toString();
+
+                CityScannerService cityScannerService = new CityScannerService(MainActivity.this);
+                outputBasicInfo.setText("");
 
                 cityScannerService.getScanResultsImage(inputCity.getText().toString(), new CityScannerService.VolleyResponseListener() {
 
@@ -149,21 +148,64 @@ public class MainActivity extends AppCompatActivity {
 
                 }); //get city basic info
 
-                cityScannerService.getScanResultsScores(inputCity.getText().toString(), new CityScannerService.VolleyScoreResponseListener() {
+                cityScannerService.getScanResultsCityDetails(inputCity.getText().toString(), new CityScannerService.VolleyDetailsResponseListener() {
+                    @Override
+                    public void onError(String message) {
+                        Toast.makeText(MainActivity.this, "There is a details error (main)", Toast.LENGTH_LONG).show();
+                    }
 
+                    @Override
+                    public void onResponse(ArrayList<CityDetails> cityDetails) {
+
+//                        sortCityDetails.add(new SortCityDetails(cityDetails));
+                        sortCityDetails.add(new CityScore(cityDetails));
+
+                    }
+
+
+                });
+
+
+                cityScannerService.getScanResultsScores(inputCity.getText().toString(), new CityScannerService.VolleyScoreResponseListener() {
                     @Override
                     public void onError(String message) {
                         Toast.makeText(MainActivity.this, "There is a score error (main)", Toast.LENGTH_LONG).show();
                     }
 
                     @Override
-                    public void onResponse(String score, String summary, ArrayList<CityScore> cityScore) {
-
+                    public void onResponse(String score, String summary, ArrayList<CityScore> cityScoreBase) {
 
                         String output = outputBasicInfo.getText().toString() + score + HtmlCompat.fromHtml(summary,0);
                         outputBasicInfo.setText(output);
 
-                        scoreRecViewAdapter.setCityScoresList(cityScore);
+                        if (sortCityDetails.isEmpty()) {
+                            System.out.println("empty bruh");
+                        }
+
+                        ArrayList<CityScore> newCityScore = new ArrayList<>();
+
+
+                        for (int i=0;i<cityScoreBase.size();i++) {
+                            String name = cityScoreBase.get(i).getName();
+                            int scoreValue = cityScoreBase.get(i).getScore();
+                            String color = cityScoreBase.get(i).getColor();
+                            for (int j=0;j<sortCityDetails.size();j++) {
+                                for (int k=0;k<sortCityDetails.get(j).getCityDetailsArray().size();k++) {
+                                    if (sortCityDetails.get(j).getCityDetailsArray().get(k).getCityDetailsName().equals(name)) {
+                                        newCityScore.add(new CityScore(name,scoreValue,color,sortCityDetails.get(j).getCityDetailsArray().get(k)));
+                                        scoreRecViewAdapter.setCityScoresList(newCityScore);
+                                    }
+
+                                }
+                            }
+                        }
+
+
+
+
+
+
+
 
                         basicInfoCard.setVisibility(View.VISIBLE);
                         scoresCard.setVisibility(View.VISIBLE);
@@ -234,6 +276,7 @@ public class MainActivity extends AppCompatActivity {
                         salaryChartCard.setVisibility(View.VISIBLE);
                     }
                 }); //get city salaries
+
 
                 System.out.println("Every service was called");
             } //btnScan OnClick

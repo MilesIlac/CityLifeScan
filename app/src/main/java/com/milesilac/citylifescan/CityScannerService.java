@@ -1,7 +1,6 @@
 package com.milesilac.citylifescan;
 
 import android.content.Context;
-import android.widget.ArrayAdapter;
 
 import com.android.volley.Request;
 import com.android.volley.Response;
@@ -29,6 +28,9 @@ public class CityScannerService {
         this.context = context;
     }
 
+    public CityScannerService() {
+    }
+
     public interface VolleyResponseListener {
         void onError(String message);
 
@@ -53,6 +55,17 @@ public class CityScannerService {
 
         void onResponse(ArrayList<CitySalaries> citySalaries);
     }
+
+    public interface VolleyDetailsResponseListener {
+        void onError(String message);
+
+        void onResponse(ArrayList<CityDetails> cityDetails);
+
+
+    }
+
+
+
 
 
     //provide image on button click
@@ -167,7 +180,7 @@ public class CityScannerService {
 
 
     //provide Scores on button click
-    public void getScanResultsScores(String cityName, VolleyScoreResponseListener volleyScoreResponseListener) {
+    public void getScanResultsScores(String cityName, VolleyScoreResponseListener volleyScoreResponseListener)  {
         cityName = cityName.toLowerCase();
         if (cityName.contains(", ")) {
             cityName = cityName.replace(", ","-");
@@ -346,4 +359,66 @@ public class CityScannerService {
         MySingleton.getInstance(context).addToRequestQueue(jsonObjectRequest);
 
     } //checkCityName
+
+
+    //provide Details on button click
+    public void getScanResultsCityDetails(String cityName, VolleyDetailsResponseListener volleyDetailsResponseListener) {
+        cityName = cityName.toLowerCase();
+        if (cityName.contains(", ")) {
+            cityName = cityName.replace(", ","-");
+        }
+        else if (cityName.contains(". ")) {
+            cityName = cityName.replace(". ","-");
+        }
+        else if (cityName.contains(" ")) {
+            cityName = cityName.replace(" ","-");
+        }
+        if (cityName.contains(".")) {
+            cityName = cityName.replace(".","");
+        }
+
+        String url = QUERY_FOR_CITY_NAME + cityName + QUERY_FOR_CITY_DETAILS;
+
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url, null ,new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                JSONArray categories;
+                JSONObject forEachScore;
+                String scoreDetailLabel;
+                ArrayList<CityDetailsData> cityDetailsData = new ArrayList<>();
+                ArrayList<CityDetails> cityDetails = new ArrayList<>();
+
+
+                try {
+                    categories = response.getJSONArray("categories");
+                    for (int i=0;i<categories.length();i++) {
+                        forEachScore = categories.getJSONObject(i); //get each score
+                        scoreDetailLabel = forEachScore.getString("label");
+                        cityDetails.add(new CityDetails(scoreDetailLabel));
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    System.out.println("Scores stack trace out");
+                }
+
+
+
+//                volleyScoreResponseListener.onResponse(scoreResult,summaryResult,scores);
+                volleyDetailsResponseListener.onResponse(cityDetails);
+                System.out.println("Scores request out");
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
+            }
+        }); // jsonObjectRequest inner class
+
+
+        MySingleton.getInstance(context).addToRequestQueue(jsonObjectRequest);
+        System.out.println("Scores queue start");
+
+    } //getScanResultsDetails
+
+
 }

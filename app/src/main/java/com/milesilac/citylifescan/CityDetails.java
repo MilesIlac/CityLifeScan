@@ -12,6 +12,10 @@ public class CityDetails {
         this.cityDetailsName = cityDetailsName;
     }
 
+    public CityDetails(ArrayList<CityDetailsData> cityDetailsData) {
+        this.cityDetailsData = cityDetailsData;
+    }
+
     public CityDetails(String cityDetailsName, ArrayList<CityDetailsData> cityDetailsData) {
         this.cityDetailsName = cityDetailsName;
         this.cityDetailsData = cityDetailsData;

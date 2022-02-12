@@ -2,12 +2,12 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:id="@+id/scoreLayout">
+    android:orientation="vertical">
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:id="@+id/scoreLayout">
 
         <TextView
             android:id="@+id/scoreName"
@@ -31,13 +31,15 @@
     <LinearLayout
         android:id="@+id/scoreDetailsTable"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="match_parent"
+        android:layout_marginStart="5dp"
+        android:layout_marginEnd="20dp">
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/scoreDetailsRecView"
             android:nestedScrollingEnabled="false"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_gravity="center"/>
     </LinearLayout>
 

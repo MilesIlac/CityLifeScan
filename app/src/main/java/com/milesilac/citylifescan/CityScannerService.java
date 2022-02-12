@@ -385,16 +385,58 @@ public class CityScannerService {
                 JSONArray categories;
                 JSONObject forEachScore;
                 String scoreDetailLabel;
-                ArrayList<CityDetailsData> cityDetailsData = new ArrayList<>();
-                ArrayList<CityDetails> cityDetails = new ArrayList<>();
+                JSONArray data;
+                JSONObject forEachData;
+                String dataObjectName;
+                String dataObjectType;
+                double dataObjectDecimal;
+                String dataObjectString;
+                int dataObjectInt;
 
+
+                ArrayList<CityDetails> cityDetails = new ArrayList<>();
+                ArrayList<CityDetailsData> cityDetailsData = new ArrayList<>();
 
                 try {
                     categories = response.getJSONArray("categories");
                     for (int i=0;i<categories.length();i++) {
                         forEachScore = categories.getJSONObject(i); //get each score
-                        scoreDetailLabel = forEachScore.getString("label");
-                        cityDetails.add(new CityDetails(scoreDetailLabel));
+                        scoreDetailLabel = forEachScore.getString("label"); //get each score name
+//                        cityDetails.add(new CityDetails(scoreDetailLabel));
+
+                        data = forEachScore.getJSONArray("data"); //get data array
+                        for (int j=0;j<data.length();j++) { //scan through data array
+                            forEachData = data.getJSONObject(j); //declare array element object
+                            dataObjectName = forEachData.getString("label");
+                            dataObjectType = forEachData.getString("type");
+                            if (dataObjectType.equals("float")) {
+                                dataObjectDecimal = forEachData.getDouble("float_value");
+                                cityDetailsData.add(new CityDetailsData(scoreDetailLabel,dataObjectName,dataObjectType,dataObjectDecimal)); //put each value in an array element, equivalent to one jsonobject
+                            }
+                            if (dataObjectType.equals("percent")) {
+                                dataObjectDecimal = forEachData.getDouble("percent_value");
+                                cityDetailsData.add(new CityDetailsData(scoreDetailLabel,dataObjectName,dataObjectType,dataObjectDecimal));
+                            }
+                            if (dataObjectType.equals("currency_dollar")) {
+                                dataObjectDecimal = forEachData.getDouble("currency_dollar_value");
+                                cityDetailsData.add(new CityDetailsData(scoreDetailLabel,dataObjectName,dataObjectType,dataObjectDecimal));
+                            }
+                            if (dataObjectType.equals("string")) {
+                                dataObjectString = forEachData.getString("string_value");
+                                cityDetailsData.add(new CityDetailsData(scoreDetailLabel,dataObjectName,dataObjectType,dataObjectString));
+                            }
+                            if (dataObjectType.equals("url")) {
+                                dataObjectString = forEachData.getString("url_value");
+                                cityDetailsData.add(new CityDetailsData(scoreDetailLabel,dataObjectName,dataObjectType,dataObjectString));
+
+                            }
+                            if (dataObjectType.equals("int")) {
+                                dataObjectInt = forEachData.getInt("int_value");
+                                cityDetailsData.add(new CityDetailsData(scoreDetailLabel,dataObjectName,dataObjectType,dataObjectInt));
+                            }
+
+                        }
+                        cityDetails.add(new CityDetails(scoreDetailLabel,cityDetailsData)); //no output
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -405,7 +447,7 @@ public class CityScannerService {
 
 //                volleyScoreResponseListener.onResponse(scoreResult,summaryResult,scores);
                 volleyDetailsResponseListener.onResponse(cityDetails);
-                System.out.println("Scores request out");
+                System.out.println("Details request out");
             }
         }, new Response.ErrorListener() {
             @Override

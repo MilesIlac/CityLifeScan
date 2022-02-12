@@ -23,6 +23,7 @@ import java.util.ArrayList;
 public class ScoreRecViewAdapter extends RecyclerView.Adapter<ScoreRecViewAdapter.ViewHolder> {
 
     ArrayList<CityScore> cityScoresList = new ArrayList<>();
+//    ArrayList<CityDetailsData> getEachCityDetailsData = new ArrayList<>();
 
     Context context;
 
@@ -48,33 +49,104 @@ public class ScoreRecViewAdapter extends RecyclerView.Adapter<ScoreRecViewAdapte
         holder.scoreDetailsRecView.setLayoutManager(new LinearLayoutManager(context));
 
         //-- set Score name, score rating, and color
-        holder.scoreName.setText(cityScoresList.get(position).getName());
-        if (cityScoresList.get(position).getName().equals("Housing")) {
-            getCurrentScoreName = cityScoresList.get(position).getName();
-        }
-        holder.scoreRating.setProgress(cityScoresList.get(position).getScore());
-
+        holder.scoreName.setText(cityScoresList.get(position).getName()); //set Score name
+        holder.scoreRating.setProgress(cityScoresList.get(position).getScore()); //set Score Value
         int currentColor = Color.parseColor(cityScoresList.get(position).getColor());
-        holder.scoreRating.setProgressTintList(ColorStateList.valueOf(currentColor));
+        holder.scoreRating.setProgressTintList(ColorStateList.valueOf(currentColor)); //set Score color
         //--
 
         //-- get details list
-//        scoreDetailsRecViewAdapter.setCityDetails(cityScoresList.get(position).getCityDetails());
-        scoreDetailsRecViewAdapter.setCityDetails(cityScoresList.get(position).getCityDetails());
+
+
+//        if (cityScoresList.get(position).getCityDetails().getCityDetailsName().equals("Housing")) {
+//            ArrayList<CityDetailsData> getEachCityDetailsData = new ArrayList<>();
+//            for (int i=0;i<cityScoresList.get(position).getCityDetails().getCityDetailsData().size();i++) {
+//                if (cityScoresList.get(position).getCityDetails().getCityDetailsData().get(i).getScoreName().equals("Housing")) {
+//                    System.out.println("getCityDetailsHousing (@scoresrecviewadapter): " + cityScoresList.get(position).getCityDetails().getCityDetailsData().get(i).getLabelName());
+//                    String name = cityScoresList.get(position).getCityDetails().getCityDetailsData().get(i).getLabelName();
+//                    getEachCityDetailsData.add(new CityDetailsData(name));
+//                }
+//            }
+//            scoreDetailsRecViewAdapter.setCityDetailsDataList(getEachCityDetailsData);
+//        }
+//        if (cityScoresList.get(position).getCityDetails().getCityDetailsName().equals("Cost of Living")) {
+//            ArrayList<CityDetailsData> getEachCityDetailsData = new ArrayList<>();
+//            for (int i=0;i<cityScoresList.get(position).getCityDetails().getCityDetailsData().size();i++) {
+//                if (cityScoresList.get(position).getCityDetails().getCityDetailsData().get(i).getScoreName().equals("Cost of Living")) {
+//                    System.out.println("getCityDetailsCostOfLiving (@scoresrecviewadapter): " + cityScoresList.get(position).getCityDetails().getCityDetailsData().get(i).getLabelName());
+//                    String name = cityScoresList.get(position).getCityDetails().getCityDetailsData().get(i).getLabelName();
+//                    getEachCityDetailsData.add(new CityDetailsData(name));
+//                }
+//            }
+//            scoreDetailsRecViewAdapter.setCityDetailsDataList(getEachCityDetailsData);
+//        }
 
 
 
+
+
+
+
+
+
+
+        if (cityScoresList.get(position).getCityDetails().getCityDetailsName().equals(cityScoresList.get(position).getName())) {
+            ArrayList<CityDetailsData> getEachCityDetailsData = new ArrayList<>();
+            for (int i=0;i<cityScoresList.get(position).getCityDetails().getCityDetailsData().size();i++) {
+                String scoreName = cityScoresList.get(position).getCityDetails().getCityDetailsData().get(i).getScoreName();
+                if (scoreName.equals(cityScoresList.get(position).getName())) {
+                    System.out.println("getCityDetails (@scoresrecviewadapter): " + cityScoresList.get(position).getCityDetails().getCityDetailsData().get(i).getLabelName());
+                    String name = cityScoresList.get(position).getCityDetails().getCityDetailsData().get(i).getLabelName();
+                    String type = cityScoresList.get(position).getCityDetails().getCityDetailsData().get(i).getType();
+                    if (type.equals("float")) {
+                        double decimal_value = cityScoresList.get(position).getCityDetails().getCityDetailsData().get(i).getDecimal_value();
+                        getEachCityDetailsData.add(new CityDetailsData(scoreName,name,type,decimal_value));
+                    }
+                    if (type.equals("percent")) {
+                        double decimal_value = cityScoresList.get(position).getCityDetails().getCityDetailsData().get(i).getDecimal_value();
+                        getEachCityDetailsData.add(new CityDetailsData(scoreName,name,type,decimal_value));
+                    }
+                    if (type.equals("currency_dollar")) {
+                        double decimal_value = cityScoresList.get(position).getCityDetails().getCityDetailsData().get(i).getDecimal_value();
+                        getEachCityDetailsData.add(new CityDetailsData(scoreName,name,type,decimal_value));
+                    }
+                    if (type.equals("string")) {
+                        String string_value = cityScoresList.get(position).getCityDetails().getCityDetailsData().get(i).getString_value();
+                        getEachCityDetailsData.add(new CityDetailsData(scoreName,name,type,string_value));
+                    }
+                    if (type.equals("url")) {
+                        String string_value = cityScoresList.get(position).getCityDetails().getCityDetailsData().get(i).getString_value();
+                        getEachCityDetailsData.add(new CityDetailsData(scoreName,name,type,string_value));
+                    }
+                    if (type.equals("int")) {
+                        int int_value = cityScoresList.get(position).getCityDetails().getCityDetailsData().get(i).getInt_value();
+                        getEachCityDetailsData.add(new CityDetailsData(scoreName,name,type,int_value));
+                    }
+                }
+            }
+            scoreDetailsRecViewAdapter.setCityDetailsDataList(getEachCityDetailsData);
+        }
+
+
+
+
+        holder.scoreDetailsTable.setVisibility(View.GONE);
 
 
 
         holder.scoreLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                //on item click template
-//                if (holder.getAdapterPosition() == 0) {
-//                    pieChartDialog.show();
-//                }
-                holder.scoreDetailsTable.setVisibility(View.VISIBLE);
+                switch (holder.scoreDetailsTable.getVisibility()) {
+                    case View.GONE:
+                        holder.scoreDetailsTable.setVisibility(View.VISIBLE);
+                        break;
+                    case View.VISIBLE:
+                        holder.scoreDetailsTable.setVisibility(View.GONE);
+                        break;
+
+                }
+
             }
         });
 

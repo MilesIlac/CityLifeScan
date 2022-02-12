@@ -15,7 +15,8 @@ import java.util.ArrayList;
 
 public class ScoreDetailsRecViewAdapter extends RecyclerView.Adapter<ScoreDetailsRecViewAdapter.ViewHolder> {
 
-    CityDetails cityDetails;
+
+    ArrayList<CityDetailsData> cityDetailsData = new ArrayList<>();
 
     Context context;
 
@@ -32,24 +33,46 @@ public class ScoreDetailsRecViewAdapter extends RecyclerView.Adapter<ScoreDetail
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        holder.scoreDetailName.setText(cityDetails.getCityDetailsName());
+//        holder.scoreDetailName.setText(cityDetails.getCityDetailsName());
+        holder.scoreDetailName.setText((cityDetailsData.get(position).getLabelName()));
+        if (cityDetailsData.get(position).getType().equals("float")) {
+            double getFloat = Math.round(cityDetailsData.get(position).getDecimal_value()*100.0)/100.0;
+            holder.scoreDetailValue.setText(String.valueOf(getFloat));
+        }
+        if (cityDetailsData.get(position).getType().equals("percent")) {
+            double getPercentage = Math.round(cityDetailsData.get(position).getDecimal_value()*100.0)/100.0;
+            String percent = getPercentage + "%";
+            holder.scoreDetailValue.setText(percent);
+        }
+        if (cityDetailsData.get(position).getType().equals("currency_dollar")) {
+            String price = "$" + cityDetailsData.get(position).getDecimal_value();
+            holder.scoreDetailValue.setText(price);
+        }
+        if (cityDetailsData.get(position).getType().equals("int")) {
+            holder.scoreDetailValue.setText(String.valueOf(cityDetailsData.get(position).getInt_value()));
+        }
+        if (cityDetailsData.get(position).getType().equals("string")) {
+            holder.scoreDetailValue.setText(cityDetailsData.get(position).getString_value());
+        }
+        if (cityDetailsData.get(position).getType().equals("url")) {
+            holder.scoreDetailValue.setText(cityDetailsData.get(position).getString_value());
+        }
+
+
     }
+
+
 
     @Override
     public int getItemCount() {
-        return 1;
+        return cityDetailsData.size();
     }
 
-//    public void setCityDetails(ArrayList<CityDetails> cityDetails) {
-//        this.cityDetails = cityDetails;
-//        notifyDataSetChanged();
-//    }
 
-    public void setCityDetails(CityDetails cityDetails) {
-        this.cityDetails = cityDetails;
+    public void setCityDetailsDataList(ArrayList<CityDetailsData> cityDetailsData) {
+        this.cityDetailsData = cityDetailsData;
         notifyDataSetChanged();
     }
-
 
 
     public static class ViewHolder extends RecyclerView.ViewHolder {

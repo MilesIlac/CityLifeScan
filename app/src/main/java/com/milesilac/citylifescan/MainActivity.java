@@ -46,7 +46,10 @@ public class MainActivity extends AppCompatActivity {
     public static String getCityNameInput;
 
 //    public static ArrayList<SortCityDetails> sortCityDetails = new ArrayList<>();
-    public static ArrayList<CityScore> sortCityDetails = new ArrayList<>();
+//    public static ArrayList<CityScore> sortCityDetails = new ArrayList<>();
+
+    public static ArrayList<CityDetails> sortCityDetails = new ArrayList<>();
+    public static CityDetails getCityDetails;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -157,8 +160,28 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onResponse(ArrayList<CityDetails> cityDetails) {
 
-//                        sortCityDetails.add(new SortCityDetails(cityDetails));
-                        sortCityDetails.add(new CityScore(cityDetails));
+//
+//                        for (int i=0;i<cityDetails.size();i++) {
+//                            String name = cityDetails.get(i).getCityDetailsName();
+//                            ArrayList<CityDetailsData> data = cityDetails.get(i).getCityDetailsData();
+//                            sortCityDetails.add(new CityDetails(name,data));
+//                        }
+
+                        sortCityDetails = cityDetails;
+
+
+                        for (int i=0;i<sortCityDetails.size();i++) {
+                            if (sortCityDetails.get(i).getCityDetailsName().equals("Housing")) {
+                                for (int j=0;j<sortCityDetails.get(i).getCityDetailsData().size();j++) {
+                                    if (sortCityDetails.get(i).getCityDetailsData().get(j).getScoreName().equals("Housing")) {
+                                        System.out.println("sortCityDetails: " + sortCityDetails.get(i).getCityDetailsData().get(j).getLabelName());
+                                    }
+                                }
+                            }
+
+                        }
+
+
 
                     }
 
@@ -182,29 +205,32 @@ public class MainActivity extends AppCompatActivity {
                             System.out.println("empty bruh");
                         }
 
+//                        ArrayList<CityScore> onlyNameScoreValue = new ArrayList<>();
                         ArrayList<CityScore> newCityScore = new ArrayList<>();
 
+//                        for (int i=0;i<cityScoreBase.size();i++) {
+//                            String name = cityScoreBase.get(i).getName();
+//                            int scoreValue = cityScoreBase.get(i).getScore();
+//                            String color = cityScoreBase.get(i).getColor();
+//                            onlyNameScoreValue.add(new CityScore(name,scoreValue,color));
+//
+//                        }
+//                        scoreRecViewAdapter.setCityScoresList(newCityScore);
+
+//                        newCityScore.add(new CityScore(name,scoreValue,color,getCityDetails));
 
                         for (int i=0;i<cityScoreBase.size();i++) {
                             String name = cityScoreBase.get(i).getName();
                             int scoreValue = cityScoreBase.get(i).getScore();
                             String color = cityScoreBase.get(i).getColor();
                             for (int j=0;j<sortCityDetails.size();j++) {
-                                for (int k=0;k<sortCityDetails.get(j).getCityDetailsArray().size();k++) {
-                                    if (sortCityDetails.get(j).getCityDetailsArray().get(k).getCityDetailsName().equals(name)) {
-                                        newCityScore.add(new CityScore(name,scoreValue,color,sortCityDetails.get(j).getCityDetailsArray().get(k)));
-                                        scoreRecViewAdapter.setCityScoresList(newCityScore);
-                                    }
-
+                                if (sortCityDetails.get(j).getCityDetailsName().equals(name)) {
+                                    newCityScore.add(new CityScore(name,scoreValue,color,sortCityDetails.get(j)));
                                 }
                             }
+
                         }
-
-
-
-
-
-
+                        scoreRecViewAdapter.setCityScoresList(newCityScore);
 
 
                         basicInfoCard.setVisibility(View.VISIBLE);

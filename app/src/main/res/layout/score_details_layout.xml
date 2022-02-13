@@ -10,6 +10,7 @@
         android:layout_weight="1"
         android:paddingStart="5dp"
         android:paddingEnd="5dp"
+        android:textColor="#b9b3aa"
         android:text="Effective company profit tax rate on payouts as dividends [Teleport score]"/>
 
     <TextView
@@ -18,5 +19,6 @@
         android:layout_gravity="end"
         android:textAlignment="textEnd"
         android:id="@+id/scoreDetailValue"
+        android:textColor="#b9b3aa"
         android:text="497.4098114830862"/>
 </LinearLayout>

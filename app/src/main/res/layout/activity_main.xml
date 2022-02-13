@@ -4,8 +4,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:id="@+id/mainActivityLayout"
     tools:context=".MainActivity"
-    android:background="#00897B">
+    android:background="#1c1e1f">
 
     <androidx.core.widget.NestedScrollView
         android:id="@+id/outputScrollView"
@@ -14,7 +15,8 @@
         app:layout_constraintBottom_toTopOf="@+id/toolbar"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/inputCity">
+        app:layout_constraintTop_toBottomOf="@+id/inputCity"
+        >
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -31,7 +33,10 @@
                 app:contentPadding="10dp"
                 app:cardElevation="5dp"
                 android:layout_margin="5dp"
-                android:visibility="gone">
+                android:backgroundTint="#181a1b"
+                app:strokeColor="#93761e"
+                app:strokeWidth="3dp"
+                android:background="#93761e">
 
                 <com.android.volley.toolbox.NetworkImageView
                     android:id="@+id/photo"
@@ -50,19 +55,25 @@
                 android:layout_gravity="center"
                 app:cardElevation="5dp"
                 app:contentPadding="10dp"
-                android:layout_margin="5dp">
+                android:layout_margin="5dp"
+                android:backgroundTint="#181a1b"
+                app:strokeColor="#93761e"
+                app:strokeWidth="3dp">
 
                 <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
-                    android:orientation="vertical">
+                    android:orientation="vertical"
+                    >
 
                     <TextView
                         android:id="@+id/outputBasicInfo"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
-                        android:hint="Basic Info Here" />
+                        android:hint="Basic Info Here"
+                        android:textColor="#b9b3aa"
+                        android:textColorHint="#b9b3aa"/>
 
 
 
@@ -78,14 +89,18 @@
                 android:layout_gravity="center"
                 app:cardElevation="5dp"
                 app:contentPadding="10dp"
-                android:layout_margin="5dp">
+                android:layout_margin="5dp"
+                android:backgroundTint="#181a1b"
+                app:strokeColor="#93761e"
+                app:strokeWidth="3dp">
 
                     <androidx.recyclerview.widget.RecyclerView
                         android:nestedScrollingEnabled="false"
                         android:id="@+id/scoresRecView"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="center" />
+                        android:layout_gravity="center"
+                        />
 
 
 
@@ -98,7 +113,10 @@
                 android:layout_gravity="center"
                 app:cardElevation="5dp"
                 app:contentPadding="10dp"
-                android:layout_margin="5dp">
+                android:layout_margin="5dp"
+                app:strokeColor="#93761e"
+                app:strokeWidth="3dp"
+                android:backgroundTint="#181a1b">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -109,7 +127,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
-                        android:text="JOB SALARY"/>
+                        android:textColor="#b9b3aa"
+                        android:text="@string/job_salary"/>
 
                     <LinearLayout
                         android:layout_width="wrap_content"
@@ -123,15 +142,19 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="end"
-                            android:text="Estimated\nannual salary\nin USD for job:"
+                            android:text="@string/estimated_annual_salary"
+                            android:textColor="#b9b3aa"
                             android:textAlignment="textEnd"/>
 
                         <Spinner
+                            android:id="@+id/jobSpinner"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="center"
+                            android:backgroundTint="#b9b3aa"
+                            android:popupBackground="#181a1b"
                             android:text="Accountant"
-                            android:id="@+id/jobSpinner"/>
+                            android:textColor="#b9b3aa" />
 
                     </LinearLayout>
 
@@ -140,12 +163,14 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
-                        android:text="MEDIAN SALARY: "/>
+                        android:text="@string/median_salary"
+                        android:textColor="#b9b3aa"/>
 
                     <com.anychart.AnyChartView
                         android:layout_width="300dp"
                         android:layout_height="300dp"
-                        android:id="@+id/pyramidChart"/>
+                        android:id="@+id/pyramidChart"
+                        android:layout_gravity="center" />
 
 
                 </LinearLayout>
@@ -165,11 +190,14 @@
         android:id="@+id/inputCity"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:hint="Teleport City/Country"
+        android:hint="@string/input_city"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toTopOf="@+id/outputScrollView"
+        android:textColor="#b9b3aa"
+        android:textColorHint="#b9b3aa"
+        android:backgroundTint="#b9b3aa"
         android:layout_margin="50dp"/>
 
 
@@ -177,21 +205,38 @@
         android:id="@+id/toolbar"
         android:layout_width="409dp"
         android:layout_height="wrap_content"
-        android:background="@color/design_default_color_secondary"
+        android:background="#93761e"
         android:minHeight="?attr/actionBarSize"
         android:theme="?attr/actionBarTheme"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" >
+        app:layout_constraintStart_toStartOf="parent">
 
-        <Button
-            android:id="@+id/btnScan"
+        <com.google.android.material.card.MaterialCardView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="SCAN"
-            tools:layout_editor_absoluteX="57dp"
-            tools:layout_editor_absoluteY="679dp"
-            android:layout_gravity="center"/>
+            android:layout_gravity="center"
+            android:backgroundTint="#181a1b">
+
+            <Button
+                android:id="@+id/btnScan"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/btnScan"
+                tools:layout_editor_absoluteX="57dp"
+                tools:layout_editor_absoluteY="679dp"
+                android:layout_gravity="center"
+                android:backgroundTint="#181a1b"
+                android:insetTop="3dp"
+                android:insetLeft="3dp"
+                android:insetRight="3dp"
+                android:insetBottom="3dp"
+                android:textColor="#b9b3aa"
+                app:strokeColor="#93761e"
+                app:strokeWidth="1dp"/>
+
+        </com.google.android.material.card.MaterialCardView>
+
 
 
     </androidx.appcompat.widget.Toolbar>

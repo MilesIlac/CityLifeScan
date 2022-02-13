@@ -4,7 +4,6 @@ import java.util.ArrayList;
 
 public class CityDetails {
 
-
     String cityDetailsName;
     ArrayList<CityDetailsData> cityDetailsData;
 

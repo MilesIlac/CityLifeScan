@@ -4,8 +4,6 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -15,25 +13,25 @@ import java.util.ArrayList;
 
 public class ScoreDetailsRecViewAdapter extends RecyclerView.Adapter<ScoreDetailsRecViewAdapter.ViewHolder> {
 
-
     ArrayList<CityDetailsData> cityDetailsData = new ArrayList<>();
-
     Context context;
 
     public ScoreDetailsRecViewAdapter(Context context) {
         this.context = context;
     }
 
+
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.score_details_layout,parent,false);
         return new ViewHolder(view);
-    }
+    } //onCreateViewHolder
+
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-//        holder.scoreDetailName.setText(cityDetails.getCityDetailsName());
+
         holder.scoreDetailName.setText((cityDetailsData.get(position).getLabelName()));
         if (cityDetailsData.get(position).getType().equals("float")) {
             double getFloat = Math.round(cityDetailsData.get(position).getDecimal_value()*100.0)/100.0;
@@ -58,9 +56,7 @@ public class ScoreDetailsRecViewAdapter extends RecyclerView.Adapter<ScoreDetail
             holder.scoreDetailValue.setText(cityDetailsData.get(position).getString_value());
         }
 
-
-    }
-
+    } //onBindViewHolder
 
 
     @Override
@@ -86,6 +82,6 @@ public class ScoreDetailsRecViewAdapter extends RecyclerView.Adapter<ScoreDetail
             scoreDetailValue = itemView.findViewById(R.id.scoreDetailValue);
         }
 
-
     }
+
 }

@@ -1,6 +1,5 @@
 package com.milesilac.citylifescan;
 
-import java.util.ArrayList;
 
 public class CityDetailsData {
 
@@ -11,9 +10,6 @@ public class CityDetailsData {
     double decimal_value;
     int int_value;
 
-    public CityDetailsData(String labelName) {
-        this.labelName = labelName;
-    }
 
     public CityDetailsData(String scoreName, String labelName, String type, String string_value) {
         this.scoreName = scoreName;

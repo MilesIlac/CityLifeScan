@@ -60,12 +60,7 @@ public class CityScannerService {
         void onError(String message);
 
         void onResponse(ArrayList<CityDetails> cityDetails);
-
-
     }
-
-
-
 
 
     //provide image on button click
@@ -85,35 +80,27 @@ public class CityScannerService {
         }
         String url = QUERY_FOR_CITY_NAME + cityName + QUERY_FOR_CITY_IMAGE;
 
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url, null ,new Response.Listener<JSONObject>() {
-            @Override
-            public void onResponse(JSONObject response) {
-                JSONArray photos;
-                JSONObject image;
-                String imageMobile = "";
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url, null , response -> {
+            JSONArray photos;
+            JSONObject image;
+            String imageMobile = "";
 
-                try {
-                    photos = response.getJSONArray("photos");
-                    JSONObject getImage = photos.getJSONObject(0);
-                    image = getImage.getJSONObject("image");
-                    imageMobile = image.getString("mobile");
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                    System.out.println("Image stack trace out");
-                }
-
-                String imgUrl = imageMobile;
-
-                volleyResponseListener.onResponse(imgUrl);
-
-                System.out.println("Image request out");
+            try {
+                photos = response.getJSONArray("photos");
+                JSONObject getImage = photos.getJSONObject(0);
+                image = getImage.getJSONObject("image");
+                imageMobile = image.getString("mobile");
+            } catch (JSONException e) {
+                e.printStackTrace();
+                System.out.println("Image stack trace out");
             }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                volleyResponseListener.onError("Image not uploaded");
-            }
-        }); // jsonObjectRequest inner class
+
+            String imgUrl = imageMobile;
+
+            volleyResponseListener.onResponse(imgUrl);
+
+            System.out.println("Image request out");
+        }, error -> volleyResponseListener.onError("Image not uploaded")); // jsonObjectRequest inner class
 
         MySingleton.getInstance(context).addToRequestQueue(jsonObjectRequest);
         System.out.println("Image queue start");
@@ -139,38 +126,30 @@ public class CityScannerService {
 
         String url = QUERY_FOR_CITY_NAME + cityName + "/";
 
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url, null ,new Response.Listener<JSONObject>() {
-            @Override
-            public void onResponse(JSONObject response) {
-                String fullName = "";
-                String continent = "";
-                String currentMayor = "";
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url, null , response -> {
+            String fullName = "";
+            String continent = "";
+            String currentMayor = "";
 
 
-                try {
-                    fullName = response.getString("full_name");
-                    continent = response.getString("continent");
-                    currentMayor = response.getString("mayor");
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                    System.out.println("Basic Info stack trace out");
-                }
-
-                String testOutput = "Full name: " + fullName + "\n" +
-                                    "Continent name: " + continent + "\n" +
-                                    "Current Mayor: " + currentMayor + "\n";
-
-
-                volleyResponseListener.onResponse(testOutput);
-
-                System.out.println("Info request out");
+            try {
+                fullName = response.getString("full_name");
+                continent = response.getString("continent");
+                currentMayor = response.getString("mayor");
+            } catch (JSONException e) {
+                e.printStackTrace();
+                System.out.println("Basic Info stack trace out");
             }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                volleyResponseListener.onError("Not a Teleport City yet");
-            }
-        }); // jsonObjectRequest inner class
+
+            String testOutput = "Full name: " + fullName + "\n" +
+                                "Continent name: " + continent + "\n" +
+                                "Current Mayor: " + currentMayor + "\n";
+
+
+            volleyResponseListener.onResponse(testOutput);
+
+            System.out.println("Info request out");
+        }, error -> volleyResponseListener.onError("Not a Teleport City yet")); // jsonObjectRequest inner class
 
 
         MySingleton.getInstance(context).addToRequestQueue(jsonObjectRequest);
@@ -197,44 +176,36 @@ public class CityScannerService {
 
         String url = QUERY_FOR_CITY_NAME + cityName + QUERY_FOR_CITY_SCORES;
 
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url, null ,new Response.Listener<JSONObject>() {
-            @Override
-            public void onResponse(JSONObject response) {
-                double teleport_city_score = 0;
-                String summary = "";
-                JSONArray categories;
-                JSONObject scoresVerbose;
-                ArrayList<CityScore> scores = new ArrayList<>();
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url, null , response -> {
+            double teleport_city_score = 0;
+            String summary = "";
+            JSONArray categories;
+            JSONObject scoresVerbose;
+            ArrayList<CityScore> scores = new ArrayList<>();
 
-                try {
-                    teleport_city_score = response.getDouble("teleport_city_score");
-                    summary = response.getString("summary");
-                    categories = response.getJSONArray("categories");
-                    for (int i=0;i<categories.length();i++) {
-                        scoresVerbose = categories.getJSONObject(i);
-                        scores.add(new CityScore(scoresVerbose.getString("name")
-                                    ,scoresVerbose.getInt("score_out_of_10")
-                                    ,scoresVerbose.getString("color")));
-                    }
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                    System.out.println("Scores stack trace out");
+            try {
+                teleport_city_score = response.getDouble("teleport_city_score");
+                summary = response.getString("summary");
+                categories = response.getJSONArray("categories");
+                for (int i=0;i<categories.length();i++) {
+                    scoresVerbose = categories.getJSONObject(i);
+                    scores.add(new CityScore(scoresVerbose.getString("name")
+                                ,scoresVerbose.getInt("score_out_of_10")
+                                ,scoresVerbose.getString("color")));
                 }
-
-                String scoreResult = "Teleport City Score: " + teleport_city_score + "\n";
-                String summaryResult = "Summary: " + summary;
-
-
-                volleyScoreResponseListener.onResponse(scoreResult,summaryResult,scores);
-
-                System.out.println("Scores request out");
+            } catch (JSONException e) {
+                e.printStackTrace();
+                System.out.println("Scores stack trace out");
             }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                volleyScoreResponseListener.onError("Not a Teleport City yet");
-            }
-        }); // jsonObjectRequest inner class
+
+            String scoreResult = "Teleport City Score: " + teleport_city_score + "\n";
+            String summaryResult = "Summary: " + summary;
+
+
+            volleyScoreResponseListener.onResponse(scoreResult,summaryResult,scores);
+
+            System.out.println("Scores request out");
+        }, error -> volleyScoreResponseListener.onError("Not a Teleport City yet")); // jsonObjectRequest inner class
 
 
         MySingleton.getInstance(context).addToRequestQueue(jsonObjectRequest);
@@ -261,49 +232,43 @@ public class CityScannerService {
 
         String url = QUERY_FOR_CITY_NAME + cityName + QUERY_FOR_CITY_SALARIES;
 
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url, null ,new Response.Listener<JSONObject>() {
-            @Override
-            public void onResponse(JSONObject response) {
-                JSONArray salaries;
-                JSONObject getSalaryDetails;
-                JSONObject job;
-                String title;
-                JSONObject salaryPercentiles;
-                double percentile_25;
-                double percentile_50;
-                double percentile_75;
-                ArrayList<CitySalaries> salaryData = new ArrayList<>();
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url, null , response -> {
+            JSONArray salaries;
+            JSONObject getSalaryDetails;
+            JSONObject job;
+            String title;
+            JSONObject salaryPercentiles;
+            double percentile_25;
+            double percentile_50;
+            double percentile_75;
+            ArrayList<CitySalaries> salaryData = new ArrayList<>();
 
-                try {
-                    salaries = response.getJSONArray("salaries");
-                    for (int i=0;i<salaries.length();i++) {
-                        getSalaryDetails = salaries.getJSONObject(i);
+            try {
+                salaries = response.getJSONArray("salaries");
+                for (int i=0;i<salaries.length();i++) {
+                    getSalaryDetails = salaries.getJSONObject(i);
 
-                        job = getSalaryDetails.getJSONObject("job");
-                        title = job.getString("title");
+                    job = getSalaryDetails.getJSONObject("job");
+                    title = job.getString("title");
 
-                        salaryPercentiles = getSalaryDetails.getJSONObject("salary_percentiles");
-                        percentile_25 = salaryPercentiles.getDouble("percentile_25");
-                        percentile_50 = salaryPercentiles.getDouble("percentile_50");
-                        percentile_75 = salaryPercentiles.getDouble("percentile_75");
+                    salaryPercentiles = getSalaryDetails.getJSONObject("salary_percentiles");
+                    percentile_25 = salaryPercentiles.getDouble("percentile_25");
+                    percentile_50 = salaryPercentiles.getDouble("percentile_50");
+                    percentile_75 = salaryPercentiles.getDouble("percentile_75");
 
-                        salaryData.add(new CitySalaries(title,percentile_25,percentile_50,percentile_75));
-                    }
-
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                    System.out.println("Scores stack trace out");
+                    salaryData.add(new CitySalaries(title,percentile_25,percentile_50,percentile_75));
                 }
 
-
-                volleySalaryResponseListener.onResponse(salaryData);
-
-                System.out.println("Salary data request out");
+            } catch (JSONException e) {
+                e.printStackTrace();
+                System.out.println("Scores stack trace out");
             }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-            }
+
+
+            volleySalaryResponseListener.onResponse(salaryData);
+
+            System.out.println("Salary data request out");
+        }, error -> {
         }); // jsonObjectRequest inner class
 
 
@@ -318,43 +283,33 @@ public class CityScannerService {
 
         System.out.println("this was accessed");
 
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, QUERY_FOR_ALL_URBAN_AREAS, null, new Response.Listener<JSONObject>() {
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, QUERY_FOR_ALL_URBAN_AREAS, null, response -> {
+            JSONObject links;
+            JSONArray urbanAreas;
+            JSONObject getName;
+            ArrayList<String> names = new ArrayList<>();
 
 
-            @Override
-            public void onResponse(JSONObject response) {
-                JSONObject links;
-                JSONArray urbanAreas;
-                JSONObject getName;
-                ArrayList<String> names = new ArrayList<>();
-
-
-                try {
-                    links = response.getJSONObject("_links");
-                    urbanAreas = links.getJSONArray("ua:item");
-                    for (int i=0;i<urbanAreas.length();i++) {
-                        getName = urbanAreas.getJSONObject(i);
-                        names.add(getName.getString("name"));
-                    }
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                    System.out.println("City name stack trace out");
+            try {
+                links = response.getJSONObject("_links");
+                urbanAreas = links.getJSONArray("ua:item");
+                for (int i=0;i<urbanAreas.length();i++) {
+                    getName = urbanAreas.getJSONObject(i);
+                    names.add(getName.getString("name"));
                 }
-
-
-                String[] countryNames = new String[names.size()];
-                for (int i=0;i<names.size();i++) {
-                    countryNames[i] = names.get(i);
-                }
-                volleyArrayResponseListener.onResponse(countryNames);
-
+            } catch (JSONException e) {
+                e.printStackTrace();
+                System.out.println("City name stack trace out");
             }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                volleyArrayResponseListener.onError("City Name check error");
+
+
+            String[] countryNames = new String[names.size()];
+            for (int i=0;i<names.size();i++) {
+                countryNames[i] = names.get(i);
             }
-        });
+            volleyArrayResponseListener.onResponse(countryNames);
+
+        }, error -> volleyArrayResponseListener.onError("City Name check error"));
 
         MySingleton.getInstance(context).addToRequestQueue(jsonObjectRequest);
 
@@ -379,83 +334,73 @@ public class CityScannerService {
 
         String url = QUERY_FOR_CITY_NAME + cityName + QUERY_FOR_CITY_DETAILS;
 
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url, null ,new Response.Listener<JSONObject>() {
-            @Override
-            public void onResponse(JSONObject response) {
-                JSONArray categories;
-                JSONObject forEachScore;
-                String scoreDetailLabel;
-                JSONArray data;
-                JSONObject forEachData;
-                String dataObjectName;
-                String dataObjectType;
-                double dataObjectDecimal;
-                String dataObjectString;
-                int dataObjectInt;
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url, null , response -> {
+            JSONArray categories;
+            JSONObject forEachScore;
+            String scoreDetailLabel;
+            JSONArray data;
+            JSONObject forEachData;
+            String dataObjectName;
+            String dataObjectType;
+            double dataObjectDecimal;
+            String dataObjectString;
+            int dataObjectInt;
 
 
-                ArrayList<CityDetails> cityDetails = new ArrayList<>();
-                ArrayList<CityDetailsData> cityDetailsData = new ArrayList<>();
+            ArrayList<CityDetails> cityDetails = new ArrayList<>();
+            ArrayList<CityDetailsData> cityDetailsData = new ArrayList<>();
 
-                try {
-                    categories = response.getJSONArray("categories");
-                    for (int i=0;i<categories.length();i++) {
-                        forEachScore = categories.getJSONObject(i); //get each score
-                        scoreDetailLabel = forEachScore.getString("label"); //get each score name
+            try {
+                categories = response.getJSONArray("categories");
+                for (int i=0;i<categories.length();i++) {
+                    forEachScore = categories.getJSONObject(i); //get each score
+                    scoreDetailLabel = forEachScore.getString("label"); //get each score name
 //                        cityDetails.add(new CityDetails(scoreDetailLabel));
 
-                        data = forEachScore.getJSONArray("data"); //get data array
-                        for (int j=0;j<data.length();j++) { //scan through data array
-                            forEachData = data.getJSONObject(j); //declare array element object
-                            dataObjectName = forEachData.getString("label");
-                            dataObjectType = forEachData.getString("type");
-                            if (dataObjectType.equals("float")) {
-                                dataObjectDecimal = forEachData.getDouble("float_value");
-                                cityDetailsData.add(new CityDetailsData(scoreDetailLabel,dataObjectName,dataObjectType,dataObjectDecimal)); //put each value in an array element, equivalent to one jsonobject
-                            }
-                            if (dataObjectType.equals("percent")) {
-                                dataObjectDecimal = forEachData.getDouble("percent_value");
-                                cityDetailsData.add(new CityDetailsData(scoreDetailLabel,dataObjectName,dataObjectType,dataObjectDecimal));
-                            }
-                            if (dataObjectType.equals("currency_dollar")) {
-                                dataObjectDecimal = forEachData.getDouble("currency_dollar_value");
-                                cityDetailsData.add(new CityDetailsData(scoreDetailLabel,dataObjectName,dataObjectType,dataObjectDecimal));
-                            }
-                            if (dataObjectType.equals("string")) {
-                                dataObjectString = forEachData.getString("string_value");
-                                cityDetailsData.add(new CityDetailsData(scoreDetailLabel,dataObjectName,dataObjectType,dataObjectString));
-                            }
-                            if (dataObjectType.equals("url")) {
-                                dataObjectString = forEachData.getString("url_value");
-                                cityDetailsData.add(new CityDetailsData(scoreDetailLabel,dataObjectName,dataObjectType,dataObjectString));
-
-                            }
-                            if (dataObjectType.equals("int")) {
-                                dataObjectInt = forEachData.getInt("int_value");
-                                cityDetailsData.add(new CityDetailsData(scoreDetailLabel,dataObjectName,dataObjectType,dataObjectInt));
-                            }
+                    data = forEachScore.getJSONArray("data"); //get data array
+                    for (int j=0;j<data.length();j++) { //scan through data array
+                        forEachData = data.getJSONObject(j); //declare array element object
+                        dataObjectName = forEachData.getString("label");
+                        dataObjectType = forEachData.getString("type");
+                        if (dataObjectType.equals("float")) {
+                            dataObjectDecimal = forEachData.getDouble("float_value");
+                            cityDetailsData.add(new CityDetailsData(scoreDetailLabel,dataObjectName,dataObjectType,dataObjectDecimal)); //put each value in an array element, equivalent to one jsonobject
+                        }
+                        if (dataObjectType.equals("percent")) {
+                            dataObjectDecimal = forEachData.getDouble("percent_value");
+                            cityDetailsData.add(new CityDetailsData(scoreDetailLabel,dataObjectName,dataObjectType,dataObjectDecimal));
+                        }
+                        if (dataObjectType.equals("currency_dollar")) {
+                            dataObjectDecimal = forEachData.getDouble("currency_dollar_value");
+                            cityDetailsData.add(new CityDetailsData(scoreDetailLabel,dataObjectName,dataObjectType,dataObjectDecimal));
+                        }
+                        if (dataObjectType.equals("string")) {
+                            dataObjectString = forEachData.getString("string_value");
+                            cityDetailsData.add(new CityDetailsData(scoreDetailLabel,dataObjectName,dataObjectType,dataObjectString));
+                        }
+                        if (dataObjectType.equals("url")) {
+                            dataObjectString = forEachData.getString("url_value");
+                            cityDetailsData.add(new CityDetailsData(scoreDetailLabel,dataObjectName,dataObjectType,dataObjectString));
 
                         }
-                        cityDetails.add(new CityDetails(scoreDetailLabel,cityDetailsData)); //no output
+                        if (dataObjectType.equals("int")) {
+                            dataObjectInt = forEachData.getInt("int_value");
+                            cityDetailsData.add(new CityDetailsData(scoreDetailLabel,dataObjectName,dataObjectType,dataObjectInt));
+                        }
+
                     }
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                    System.out.println("Scores stack trace out");
+                    cityDetails.add(new CityDetails(scoreDetailLabel,cityDetailsData)); //no output
                 }
-
-
-
-//                volleyScoreResponseListener.onResponse(scoreResult,summaryResult,scores);
-                volleyDetailsResponseListener.onResponse(cityDetails);
-                System.out.println("Details request out");
+            } catch (JSONException e) {
+                e.printStackTrace();
+                System.out.println("Scores stack trace out");
             }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
 
-            }
+            volleyDetailsResponseListener.onResponse(cityDetails);
+            System.out.println("Details request out");
+        }, error -> {
+
         }); // jsonObjectRequest inner class
-
 
         MySingleton.getInstance(context).addToRequestQueue(jsonObjectRequest);
         System.out.println("Scores queue start");

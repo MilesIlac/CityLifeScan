@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">CityLifeScan</string>
+    <!-- activity_main layout strings -->
+    <string name="job_salary">JOB SALARY</string>
+    <string name="estimated_annual_salary">Estimated\nannual salary\nin USD for job:</string>
+    <string name="median_salary">MEDIAN SALARY:&#032;</string>
+    <string name="input_city">Teleport City</string>
+    <string name="btnScan">SCAN</string>
 </resources>

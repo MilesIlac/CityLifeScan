@@ -3,6 +3,8 @@
     android:id="@+id/autocompleteLayout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:textAppearance="?android:attr/textAppearanceListItemSmall">
+    android:textAppearance="?android:attr/textAppearanceListItemSmall"
+    android:background="#181a1b"
+    android:textColor="#b9b3aa">
 
 </TextView>

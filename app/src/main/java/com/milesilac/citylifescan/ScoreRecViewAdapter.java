@@ -23,30 +23,29 @@ import java.util.ArrayList;
 public class ScoreRecViewAdapter extends RecyclerView.Adapter<ScoreRecViewAdapter.ViewHolder> {
 
     ArrayList<CityScore> cityScoresList = new ArrayList<>();
-//    ArrayList<CityDetailsData> getEachCityDetailsData = new ArrayList<>();
-
     Context context;
-
-    public static String getCurrentScoreName;
 
     public ScoreRecViewAdapter(Context context) {
         this.context = context;
     }
+
 
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.score_layout,parent,false);
         return new ViewHolder(view);
-    }
+    } //onCreateViewHolder
+
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
 
-
+        //set ScoreDetailsRecViewAdapter
         ScoreDetailsRecViewAdapter scoreDetailsRecViewAdapter = new ScoreDetailsRecViewAdapter(context);
         holder.scoreDetailsRecView.setAdapter(scoreDetailsRecViewAdapter);
         holder.scoreDetailsRecView.setLayoutManager(new LinearLayoutManager(context));
+
 
         //-- set Score name, score rating, and color
         holder.scoreName.setText(cityScoresList.get(position).getName()); //set Score name
@@ -55,47 +54,14 @@ public class ScoreRecViewAdapter extends RecyclerView.Adapter<ScoreRecViewAdapte
         holder.scoreRating.setProgressTintList(ColorStateList.valueOf(currentColor)); //set Score color
         //--
 
+
         //-- get details list
-
-
-//        if (cityScoresList.get(position).getCityDetails().getCityDetailsName().equals("Housing")) {
-//            ArrayList<CityDetailsData> getEachCityDetailsData = new ArrayList<>();
-//            for (int i=0;i<cityScoresList.get(position).getCityDetails().getCityDetailsData().size();i++) {
-//                if (cityScoresList.get(position).getCityDetails().getCityDetailsData().get(i).getScoreName().equals("Housing")) {
-//                    System.out.println("getCityDetailsHousing (@scoresrecviewadapter): " + cityScoresList.get(position).getCityDetails().getCityDetailsData().get(i).getLabelName());
-//                    String name = cityScoresList.get(position).getCityDetails().getCityDetailsData().get(i).getLabelName();
-//                    getEachCityDetailsData.add(new CityDetailsData(name));
-//                }
-//            }
-//            scoreDetailsRecViewAdapter.setCityDetailsDataList(getEachCityDetailsData);
-//        }
-//        if (cityScoresList.get(position).getCityDetails().getCityDetailsName().equals("Cost of Living")) {
-//            ArrayList<CityDetailsData> getEachCityDetailsData = new ArrayList<>();
-//            for (int i=0;i<cityScoresList.get(position).getCityDetails().getCityDetailsData().size();i++) {
-//                if (cityScoresList.get(position).getCityDetails().getCityDetailsData().get(i).getScoreName().equals("Cost of Living")) {
-//                    System.out.println("getCityDetailsCostOfLiving (@scoresrecviewadapter): " + cityScoresList.get(position).getCityDetails().getCityDetailsData().get(i).getLabelName());
-//                    String name = cityScoresList.get(position).getCityDetails().getCityDetailsData().get(i).getLabelName();
-//                    getEachCityDetailsData.add(new CityDetailsData(name));
-//                }
-//            }
-//            scoreDetailsRecViewAdapter.setCityDetailsDataList(getEachCityDetailsData);
-//        }
-
-
-
-
-
-
-
-
-
-
         if (cityScoresList.get(position).getCityDetails().getCityDetailsName().equals(cityScoresList.get(position).getName())) {
-            ArrayList<CityDetailsData> getEachCityDetailsData = new ArrayList<>();
+            ArrayList<CityDetailsData> getEachCityDetailsData = new ArrayList<>(); //filters ArrayList<CityDetailsData>
             for (int i=0;i<cityScoresList.get(position).getCityDetails().getCityDetailsData().size();i++) {
                 String scoreName = cityScoresList.get(position).getCityDetails().getCityDetailsData().get(i).getScoreName();
                 if (scoreName.equals(cityScoresList.get(position).getName())) {
-                    System.out.println("getCityDetails (@scoresrecviewadapter): " + cityScoresList.get(position).getCityDetails().getCityDetailsData().get(i).getLabelName());
+//                    System.out.println("getCityDetails (@scoresrecviewadapter): " + cityScoresList.get(position).getCityDetails().getCityDetailsData().get(i).getLabelName()); //cityData element checker
                     String name = cityScoresList.get(position).getCityDetails().getCityDetailsData().get(i).getLabelName();
                     String type = cityScoresList.get(position).getCityDetails().getCityDetailsData().get(i).getType();
                     if (type.equals("float")) {
@@ -128,37 +94,26 @@ public class ScoreRecViewAdapter extends RecyclerView.Adapter<ScoreRecViewAdapte
         }
 
 
-
-
+        //set inner RecyclerView visibility
         holder.scoreDetailsTable.setVisibility(View.GONE);
-
-
-
-        holder.scoreLayout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                switch (holder.scoreDetailsTable.getVisibility()) {
-                    case View.GONE:
-                        holder.scoreDetailsTable.setVisibility(View.VISIBLE);
-                        break;
-                    case View.VISIBLE:
-                        holder.scoreDetailsTable.setVisibility(View.GONE);
-                        break;
-
-                }
-
+        holder.scoreLayout.setOnClickListener(v -> {
+            switch (holder.scoreDetailsTable.getVisibility()) {
+                case View.GONE:
+                    holder.scoreDetailsTable.setVisibility(View.VISIBLE);
+                    break;
+                case View.VISIBLE:
+                    holder.scoreDetailsTable.setVisibility(View.GONE);
+                    break;
             }
         });
 
+    } //onBindViewHolder
 
-
-    }
 
     @Override
     public int getItemCount() {
         return cityScoresList.size();
     }
-
 
 
     public void setCityScoresList(ArrayList<CityScore> cityScoresList) {
@@ -183,7 +138,6 @@ public class ScoreRecViewAdapter extends RecyclerView.Adapter<ScoreRecViewAdapte
             scoreDetailsTable = itemView.findViewById(R.id.scoreDetailsTable);
             scoreDetailsRecView = itemView.findViewById(R.id.scoreDetailsRecView);
         }
-
 
     }
 

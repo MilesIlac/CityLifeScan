@@ -1,6 +1,5 @@
 package com.milesilac.citylifescan;
 
-import java.util.ArrayList;
 
 public class CityScore {
 
@@ -8,16 +7,6 @@ public class CityScore {
     int score;
     String color;
     CityDetails cityDetails;
-    CityDetailsData cityDetailsData;
-    ArrayList<CityDetails> cityDetailsArray;
-    ArrayList<CityDetailsData> cityDetailsDataArray;
-
-//    public CityScore(String name, int score, String color, ArrayList<CityDetailsData> cityDetailsDataArray) {
-//        this.name = name;
-//        this.score = score;
-//        this.color = color;
-//        this.cityDetailsDataArray = cityDetailsDataArray;
-//    }
 
     public CityScore(String name, int score, String color) {
         this.name = name;
@@ -25,23 +14,6 @@ public class CityScore {
         this.color = color;
     }
 
-    public CityScore(ArrayList<CityDetails> cityDetailsArray) {
-        this.cityDetailsArray = cityDetailsArray;
-    }
-
-//    public CityScore(String name, int score, String color, ArrayList<CityDetails> cityDetailsArray) {
-//        this.name = name;
-//        this.score = score;
-//        this.color = color;
-//        this.cityDetailsArray = cityDetailsArray;
-//    }
-
-    public CityScore(String name, int score, String color, CityDetailsData cityDetailsData) {
-        this.name = name;
-        this.score = score;
-        this.color = color;
-        this.cityDetailsData = cityDetailsData;
-    }
 
     public CityScore(String name, int score, String color, CityDetails cityDetails) {
         this.name = name;
@@ -50,24 +22,10 @@ public class CityScore {
         this.cityDetails = cityDetails;
     }
 
-    public CityScore(String name, int score, String color, ArrayList<CityDetailsData> cityDetailsDataArray) {
-        this.name = name;
-        this.score = score;
-        this.color = color;
-        this.cityDetailsDataArray = cityDetailsDataArray;
-    }
 
     public CityScore() {
     }
 
-    @Override
-    public String toString() {
-        return "CityScore{" +
-                "name='" + name + '\'' +
-                ", score=" + score +
-                ", color=" + color +
-                '}';
-    }
 
     public String getName() {
         return name;
@@ -101,28 +59,4 @@ public class CityScore {
         this.cityDetails = cityDetails;
     }
 
-        public ArrayList<CityDetails> getCityDetailsArray() {
-        return cityDetailsArray;
-    }
-
-//    public void setCityDetails(ArrayList<CityDetails> cityDetails) {
-//        this.cityDetails = cityDetails;
-//    }
-
-
-    public CityDetailsData getCityDetailsData() {
-        return cityDetailsData;
-    }
-
-    public void setCityDetailsData(CityDetailsData cityDetailsData) {
-        this.cityDetailsData = cityDetailsData;
-    }
-
-    public ArrayList<CityDetailsData> getCityDetailsDataArray() {
-        return cityDetailsDataArray;
-    }
-
-    public void setCityDetailsDataArray(ArrayList<CityDetailsData> cityDetailsDataArray) {
-        this.cityDetailsDataArray = cityDetailsDataArray;
-    }
 }

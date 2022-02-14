@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <com.google.android.material.card.MaterialCardView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:backgroundTint="#181a1b"
+        android:layout_gravity="center"
+        app:contentPadding="10dp"
+        app:cardElevation="5dp"
+        app:strokeColor="#93761e"
+        app:strokeWidth="3dp"
+        android:background="#93761e"
+        app:cardCornerRadius="12dp">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <com.android.volley.toolbox.NetworkImageView
+                android:id="@+id/photoZoomed"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:adjustViewBounds="true"
+                android:scaleType="fitCenter"/>
+
+            <TextView
+                android:id="@+id/imagePhotographer"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAlignment="textEnd"
+                android:layout_gravity="end"
+                android:textColor="#b9b3aa"
+                android:text="photographer name here"
+                android:textSize="11sp"
+                android:textStyle="italic" />
+
+            <TextView
+                android:id="@+id/imageAttribution"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAlignment="textEnd"
+                android:layout_gravity="end"
+                android:textColor="#b9b3aa"
+                android:text="attribution thing"
+                android:textSize="11sp"
+                android:textStyle="italic"/>
+
+        </LinearLayout>
+
+    </com.google.android.material.card.MaterialCardView>
+</androidx.constraintlayout.widget.ConstraintLayout>

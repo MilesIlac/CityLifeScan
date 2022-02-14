@@ -67,11 +67,29 @@
                     >
 
                     <TextView
+                        android:id="@+id/outputTeleportCityScore"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:hint="Score Here"
+                        android:layout_gravity="center"
+                        android:textSize="20sp"
+                        android:textColor="#b9b3aa"
+                        android:textColorHint="#b9b3aa"
+                        android:layout_marginBottom="10dp"/>
+
+                    <TextView
                         android:id="@+id/outputBasicInfo"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="center"
                         android:hint="Basic Info Here"
+                        android:textColor="#b9b3aa"
+                        android:textColorHint="#b9b3aa"/>
+
+                    <TextView
+                        android:id="@+id/outputSummary"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:hint="Summary Here"
                         android:textColor="#b9b3aa"
                         android:textColorHint="#b9b3aa"/>
 
@@ -198,7 +216,8 @@
         android:textColor="#b9b3aa"
         android:textColorHint="#b9b3aa"
         android:backgroundTint="#b9b3aa"
-        android:layout_margin="50dp"/>
+        android:layout_marginTop="50dp"
+        android:layout_marginBottom="20dp"/>
 
 
     <androidx.appcompat.widget.Toolbar

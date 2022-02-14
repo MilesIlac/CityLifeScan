@@ -5,6 +5,7 @@ import android.content.Context;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.JsonObjectRequest;
 
 import org.json.JSONArray;
@@ -34,7 +35,13 @@ public class CityScannerService {
     public interface VolleyResponseListener {
         void onError(String message);
 
-        void onResponse(String test1);
+        void onResponse(String string);
+    }
+
+    public interface VolleyImageResponseListener {
+        void onError(String message);
+
+        void onResponse(String string, String photographer, String source, String site, String license);
     }
 
     public interface VolleyArrayResponseListener {
@@ -47,7 +54,7 @@ public class CityScannerService {
     public interface VolleyScoreResponseListener {
         void onError(String message);
 
-        void onResponse(String score, String summary, ArrayList<CityScore> cityScore);
+        void onResponse(double score, String summary, ArrayList<CityScore> cityScore);
     }
 
     public interface VolleySalaryResponseListener {
@@ -64,7 +71,7 @@ public class CityScannerService {
 
 
     //provide image on button click
-    public void getScanResultsImage(String cityName, VolleyResponseListener volleyResponseListener) {
+    public void getScanResultsImage(String cityName, VolleyImageResponseListener volleyImageResponseListener) {
         cityName = cityName.toLowerCase();
         if (cityName.contains(", ")) {
             cityName = cityName.replace(", ","-");
@@ -83,24 +90,36 @@ public class CityScannerService {
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url, null , response -> {
             JSONArray photos;
             JSONObject image;
+            JSONObject attribution;
             String imageMobile = "";
+            String photographer = "";
+            String source = "";
+            String site = "";
+            String license = "";
 
             try {
                 photos = response.getJSONArray("photos");
                 JSONObject getImage = photos.getJSONObject(0);
+                //get image
                 image = getImage.getJSONObject("image");
                 imageMobile = image.getString("mobile");
+                //get attribution details
+                attribution = getImage.getJSONObject("attribution");
+                photographer = attribution.getString("photographer");
+                source = attribution.getString("source");
+                site = attribution.getString("site");
+                license =attribution.getString("license");
+
             } catch (JSONException e) {
                 e.printStackTrace();
                 System.out.println("Image stack trace out");
             }
 
-            String imgUrl = imageMobile;
+            volleyImageResponseListener.onResponse(imageMobile,photographer,source,site,license);
 
-            volleyResponseListener.onResponse(imgUrl);
 
             System.out.println("Image request out");
-        }, error -> volleyResponseListener.onError("Image not uploaded")); // jsonObjectRequest inner class
+        }, error -> volleyImageResponseListener.onError("Image not uploaded")); // jsonObjectRequest inner class
 
         MySingleton.getInstance(context).addToRequestQueue(jsonObjectRequest);
         System.out.println("Image queue start");
@@ -198,11 +217,11 @@ public class CityScannerService {
                 System.out.println("Scores stack trace out");
             }
 
-            String scoreResult = "Teleport City Score: " + teleport_city_score + "\n";
+
             String summaryResult = "Summary: " + summary;
 
 
-            volleyScoreResponseListener.onResponse(scoreResult,summaryResult,scores);
+            volleyScoreResponseListener.onResponse(teleport_city_score,summaryResult,scores);
 
             System.out.println("Scores request out");
         }, error -> volleyScoreResponseListener.onError("Not a Teleport City yet")); // jsonObjectRequest inner class

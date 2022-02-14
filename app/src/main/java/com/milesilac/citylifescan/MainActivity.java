@@ -8,8 +8,17 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 
+import android.app.Dialog;
+import android.net.Uri;
 import android.os.Bundle;
+import android.text.Html;
+import android.text.SpannableString;
+import android.text.Spanned;
+import android.text.method.LinkMovementMethod;
+import android.text.style.URLSpan;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
@@ -18,6 +27,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.NetworkImageView;
 import com.anychart.AnyChart;
 import com.anychart.AnyChartView;
@@ -28,6 +38,7 @@ import com.anychart.charts.Pyramid;
 import com.google.android.material.card.MaterialCardView;
 
 
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,19 +48,17 @@ public class MainActivity extends AppCompatActivity {
 
     Button btnScan;
     AutoCompleteTextView inputCity;
-    TextView outputBasicInfo, showMedianSalary;
-    NetworkImageView networkImageView;
+    TextView outputBasicInfo, outputSummary, outputTeleportCityScore, showMedianSalary, imagePhotographer, imageAttribution;
+    NetworkImageView networkImageView, networkImageViewZoomed;
     RecyclerView scoresRecView;
     NestedScrollView scrollView;
     MaterialCardView imageCard, basicInfoCard, scoresCard, salaryChartCard;
     AnyChartView anyChartView;
     Spinner jobSpinner;
+    Dialog photoZoomed;
 
     public static final String SHOW_MEDIAN_SALARY = "MEDIAN SALARY: $";
-
     public static String getCityNameInput;
-
-
     public static ArrayList<CityDetails> sortCityDetails = new ArrayList<>();
 
     @Override
@@ -61,6 +70,8 @@ public class MainActivity extends AppCompatActivity {
         btnScan = findViewById(R.id.btnScan);
         inputCity = findViewById(R.id.inputCity);
         outputBasicInfo = findViewById(R.id.outputBasicInfo);
+        outputSummary = findViewById(R.id.outputSummary);
+        outputTeleportCityScore = findViewById(R.id.outputTeleportCityScore);
         showMedianSalary = findViewById(R.id.showMedianSalary);
         networkImageView = findViewById(R.id.photo);
         scoresRecView = findViewById(R.id.scoresRecView);
@@ -77,6 +88,17 @@ public class MainActivity extends AppCompatActivity {
 
         //set default networkImageView
         networkImageView.setDefaultImageResId(R.drawable.ic_launcher_foreground);
+
+        //setup networkImageView dialog
+        photoZoomed = new Dialog(this);
+        photoZoomed.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        photoZoomed.setContentView(R.layout.image_view_dialog);
+        photoZoomed.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+        photoZoomed.setCancelable(true);
+
+        networkImageViewZoomed = photoZoomed.findViewById(R.id.photoZoomed);
+        imagePhotographer = photoZoomed.findViewById(R.id.imagePhotographer);
+        imageAttribution = photoZoomed.findViewById(R.id.imageAttribution);
 
         //set RecyclerViewAdapter
         ScoreRecViewAdapter scoreRecViewAdapter = new ScoreRecViewAdapter(this);
@@ -116,8 +138,10 @@ public class MainActivity extends AppCompatActivity {
 
             CityScannerService cityScannerService1 = new CityScannerService(MainActivity.this);
             outputBasicInfo.setText("");
+            outputSummary.setText("");
+            outputTeleportCityScore.setText("");
 
-            cityScannerService1.getScanResultsImage(inputCity.getText().toString(), new CityScannerService.VolleyResponseListener() {
+            cityScannerService1.getScanResultsImage(inputCity.getText().toString(), new CityScannerService.VolleyImageResponseListener() {
 
                 @Override
                 public void onError(String message) {
@@ -125,14 +149,26 @@ public class MainActivity extends AppCompatActivity {
                 }
 
                 @Override
-                public void onResponse(String imgUrl) {
+                public void onResponse(String imgUrl, String photographer, String source, String site, String license) {
                     scrollView.scrollTo(0,-1);
                     networkImageView.setImageUrl(imgUrl, MySingleton.getInstance(MainActivity.this).getImageLoader()); //ImgController from your code.
+                    networkImageViewZoomed.setImageUrl(imgUrl, MySingleton.getInstance(MainActivity.this).getImageLoader());
+
+                    String personAndSite = photographer + "@" + site;
+                    SpannableString string = new SpannableString(personAndSite);
+                    int index = personAndSite.indexOf("@");
+                    string.setSpan(new URLSpan(source), index+1, personAndSite.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                    imagePhotographer.setText(string);
+                    imagePhotographer.setMovementMethod(LinkMovementMethod.getInstance());
+                    imageAttribution.setText(license);
 
                     imageCard.setVisibility(View.VISIBLE);
 
 
-                }
+                    networkImageView.setOnClickListener(v1 -> photoZoomed.show());
+
+
+                } //onResponse
 
             }); //get city image
 
@@ -144,14 +180,12 @@ public class MainActivity extends AppCompatActivity {
                 }
 
                 @Override
-                public void onResponse(String test1) {
-                    String newOutput = outputBasicInfo.getText().toString() + test1;
-                    outputBasicInfo.setText(newOutput);
+                public void onResponse(String string) {
+                    outputBasicInfo.setText(string);
 
                 }
 
             }); //get city basic info
-
 
             cityScannerService1.getScanResultsCityDetails(inputCity.getText().toString(), new CityScannerService.VolleyDetailsResponseListener() {
                     @Override
@@ -178,8 +212,6 @@ public class MainActivity extends AppCompatActivity {
 
                 }); //get city details
 
-
-
             cityScannerService1.getScanResultsScores(inputCity.getText().toString(), new CityScannerService.VolleyScoreResponseListener() {
                 @Override
                 public void onError(String message) {
@@ -187,10 +219,13 @@ public class MainActivity extends AppCompatActivity {
                 }
 
                 @Override
-                public void onResponse(String score, String summary, ArrayList<CityScore> cityScoreBase) {
+                public void onResponse(double score, String summary, ArrayList<CityScore> cityScoreBase) {
 
-                    String output = outputBasicInfo.getText().toString() + score + HtmlCompat.fromHtml(summary,0);
-                    outputBasicInfo.setText(output);
+                    outputSummary.setText(String.valueOf(HtmlCompat.fromHtml(summary,0)));
+
+                    double roundedScore =  Math.round(score*100.0)/100.0;
+                    String scoreString = "Teleport City Score: " + roundedScore;
+                    outputTeleportCityScore.setText(scoreString);
 
                     if (sortCityDetails.isEmpty()) {
                         System.out.println("empty bruh");

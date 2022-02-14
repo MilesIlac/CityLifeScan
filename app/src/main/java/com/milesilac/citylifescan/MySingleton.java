@@ -34,6 +34,7 @@ public class MySingleton {
                         cache.put(url, bitmap);
                     }
                 }); //imageLoader inner class
+
     }
 
     public static synchronized MySingleton getInstance(Context context) {

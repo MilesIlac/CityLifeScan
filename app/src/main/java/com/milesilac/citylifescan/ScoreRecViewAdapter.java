@@ -46,7 +46,6 @@ public class ScoreRecViewAdapter extends RecyclerView.Adapter<ScoreRecViewAdapte
         holder.scoreDetailsRecView.setAdapter(scoreDetailsRecViewAdapter);
         holder.scoreDetailsRecView.setLayoutManager(new LinearLayoutManager(context));
 
-
         //-- set Score name, score rating, and color
         holder.scoreName.setText(cityScoresList.get(position).getName()); //set Score name
         holder.scoreRating.setProgress(cityScoresList.get(position).getScore()); //set Score Value
@@ -54,14 +53,12 @@ public class ScoreRecViewAdapter extends RecyclerView.Adapter<ScoreRecViewAdapte
         holder.scoreRating.setProgressTintList(ColorStateList.valueOf(currentColor)); //set Score color
         //--
 
-
         //-- get details list
         if (cityScoresList.get(position).getCityDetails().getCityDetailsName().equals(cityScoresList.get(position).getName())) {
             ArrayList<CityDetailsData> getEachCityDetailsData = new ArrayList<>(); //filters ArrayList<CityDetailsData>
             for (int i=0;i<cityScoresList.get(position).getCityDetails().getCityDetailsData().size();i++) {
                 String scoreName = cityScoresList.get(position).getCityDetails().getCityDetailsData().get(i).getScoreName();
                 if (scoreName.equals(cityScoresList.get(position).getName())) {
-//                    System.out.println("getCityDetails (@scoresrecviewadapter): " + cityScoresList.get(position).getCityDetails().getCityDetailsData().get(i).getLabelName()); //cityData element checker
                     String name = cityScoresList.get(position).getCityDetails().getCityDetailsData().get(i).getLabelName();
                     String type = cityScoresList.get(position).getCityDetails().getCityDetailsData().get(i).getType();
                     if (type.equals("float")) {
@@ -122,7 +119,7 @@ public class ScoreRecViewAdapter extends RecyclerView.Adapter<ScoreRecViewAdapte
     }
 
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
+    public static class ViewHolder extends RecyclerView.ViewHolder {
 
         TextView scoreName;
         ProgressBar scoreRating;

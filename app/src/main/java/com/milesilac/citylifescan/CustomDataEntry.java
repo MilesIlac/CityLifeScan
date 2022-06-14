@@ -10,10 +10,4 @@ public class CustomDataEntry extends DataEntry {
         setValue("salary", salary);
     }
 
-    public CustomDataEntry(Number x, Number value, Number percentile, Number salary) {
-        setValue("x", x);
-        setValue("value", value);
-        setValue("percentile", percentile);
-        setValue("salary", salary);
-    }
 }

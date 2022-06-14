@@ -27,6 +27,8 @@
 
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/imageCard"
+                android:visibility="invisible"
+                tools:visibility="visible"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
@@ -50,6 +52,8 @@
 
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/basicInfoCard"
+                android:visibility="invisible"
+                tools:visibility="visible"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
@@ -93,8 +97,6 @@
                         android:textColor="#b9b3aa"
                         android:textColorHint="#b9b3aa"/>
 
-
-
                 </LinearLayout>
 
 
@@ -102,6 +104,8 @@
 
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/scoresCard"
+                android:visibility="invisible"
+                tools:visibility="visible"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
@@ -121,11 +125,12 @@
                         />
 
 
-
             </com.google.android.material.card.MaterialCardView>
 
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/pyramidChartCard"
+                android:visibility="invisible"
+                tools:visibility="visible"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
@@ -196,9 +201,6 @@
             </com.google.android.material.card.MaterialCardView>
 
 
-
-
-
         </LinearLayout>
 
     </androidx.core.widget.NestedScrollView>
@@ -257,12 +259,7 @@
         </com.google.android.material.card.MaterialCardView>
 
 
-
     </androidx.appcompat.widget.Toolbar>
-
-
-
-
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -3,9 +3,6 @@ package com.milesilac.citylifescan;
 import android.content.Context;
 
 import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.JsonObjectRequest;
 
 import org.json.JSONArray;
@@ -14,7 +11,8 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
-public class CityScannerService {
+
+public class CityScannerService implements VolleyListeners {
 
     public static final String QUERY_FOR_CITY_NAME = "https://api.teleport.org/api/urban_areas/slug:";
     public static final String QUERY_FOR_ALL_URBAN_AREAS = "https://api.teleport.org/api/urban_areas/";
@@ -27,46 +25,6 @@ public class CityScannerService {
 
     public CityScannerService(Context context) {
         this.context = context;
-    }
-
-    public CityScannerService() {
-    }
-
-    public interface VolleyResponseListener {
-        void onError(String message);
-
-        void onResponse(String string);
-    }
-
-    public interface VolleyImageResponseListener {
-        void onError(String message);
-
-        void onResponse(String string, String photographer, String source, String site, String license);
-    }
-
-    public interface VolleyArrayResponseListener {
-        void onError(String message);
-
-        void onResponse(String[] names);
-
-    }
-
-    public interface VolleyScoreResponseListener {
-        void onError(String message);
-
-        void onResponse(double score, String summary, ArrayList<CityScore> cityScore);
-    }
-
-    public interface VolleySalaryResponseListener {
-        void onError(String message);
-
-        void onResponse(ArrayList<CitySalaries> citySalaries);
-    }
-
-    public interface VolleyDetailsResponseListener {
-        void onError(String message);
-
-        void onResponse(ArrayList<CityDetails> cityDetails);
     }
 
 
@@ -335,6 +293,8 @@ public class CityScannerService {
     } //checkCityName
 
 
+
+
     //provide Details on button click
     public void getScanResultsCityDetails(String cityName, VolleyDetailsResponseListener volleyDetailsResponseListener) {
         cityName = cityName.toLowerCase();
@@ -374,7 +334,6 @@ public class CityScannerService {
                 for (int i=0;i<categories.length();i++) {
                     forEachScore = categories.getJSONObject(i); //get each score
                     scoreDetailLabel = forEachScore.getString("label"); //get each score name
-//                        cityDetails.add(new CityDetails(scoreDetailLabel));
 
                     data = forEachScore.getJSONArray("data"); //get data array
                     for (int j=0;j<data.length();j++) { //scan through data array
@@ -414,6 +373,8 @@ public class CityScannerService {
                 e.printStackTrace();
                 System.out.println("Scores stack trace out");
             }
+
+
 
             volleyDetailsResponseListener.onResponse(cityDetails);
             System.out.println("Details request out");

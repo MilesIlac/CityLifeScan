@@ -23,9 +23,9 @@ public class CityScannerService implements VolleyListeners {
 
     Context context;
 
-    public CityScannerService(Context context) {
-        this.context = context;
-    }
+    public CityScannerService(Context context) { this.context = context; }
+
+
 
 
     //provide image on button click
@@ -73,6 +73,7 @@ public class CityScannerService implements VolleyListeners {
                 System.out.println("Image stack trace out");
             }
 
+//            String[] imageData = {imageMobile,photographer,source,site,license};
             volleyImageResponseListener.onResponse(imageMobile,photographer,source,site,license);
 
 

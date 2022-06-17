@@ -16,6 +16,7 @@ public interface VolleyListeners {
         void onError(String message);
 
         void onResponse(String string, String photographer, String source, String site, String license);
+
     }
 
     interface VolleyArrayResponseListener {

@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.app.Dialog;
+import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -31,13 +32,14 @@ import com.anychart.chart.common.dataentry.DataEntry;
 import com.anychart.charts.Pyramid;
 
 import com.google.android.material.card.MaterialCardView;
+import com.milesilac.citylifescan.model.CityDataRepository;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements CityContract.View {
 
 
 
@@ -58,6 +60,13 @@ public class MainActivity extends AppCompatActivity {
 
     ArrayList<CitySalaries> citySalariesBase = null;
     Pyramid pyramid;
+
+
+    String[] checkImageDataArray = null;
+    String checkBasicInfo = null;
+    ArrayList<CityScore> checkCityScores = null;
+    String source = null;
+    String license = null;
 
 
     @Override
@@ -113,6 +122,8 @@ public class MainActivity extends AppCompatActivity {
         scoresCard.setVisibility(View.INVISIBLE);
         salaryChartCard.setVisibility(View.INVISIBLE);
 
+        CityScanResults cityScanResults = new CityScanResults(this);
+
         //populate autocomplete
         CityScannerService cityScannerService = new CityScannerService(MainActivity.this);
         cityScannerService.checkCityName(new CityScannerService.VolleyArrayResponseListener() {
@@ -145,214 +156,270 @@ public class MainActivity extends AppCompatActivity {
             scoresCard.setVisibility(View.INVISIBLE);
             salaryChartCard.setVisibility(View.INVISIBLE);
 
-            getCityNameInput = inputCity.getText().toString();
-
+            cityScanResults.getScanResults(inputCity.getText().toString());
             CityScannerService cityScannerService1 = new CityScannerService(MainActivity.this);
+
+            executorService.execute(new Runnable() {
+                @Override
+                public void run() {
+
+
+
+                    while (checkImageDataArray == cityScanResults.readImageDataArray()) { }
+                    while (checkBasicInfo == cityScanResults.readBasicInfo()) { }
+                    while (checkCityScores == cityScanResults.readCityScores()) { }
+
+                    checkImageDataArray = cityScanResults.readImageDataArray();
+                    checkBasicInfo = cityScanResults.readBasicInfo();
+                    checkCityScores = cityScanResults.readCityScores();
+
+                    handler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            networkImageView.setImageUrl(cityScanResults.readImgUrl(), MySingleton.getInstance(MainActivity.this).getImageLoader()); //ImgController from your code.
+                            networkImageViewZoomed.setImageUrl(cityScanResults.readImgUrl(), MySingleton.getInstance(MainActivity.this).getImageLoader());
+
+
+                            String personAndSite = cityScanResults.readPhotographer() + "@" + cityScanResults.readSite();
+                            SpannableString string = new SpannableString(personAndSite);
+                            int index = personAndSite.indexOf("@");
+                            string.setSpan(new URLSpan(cityScanResults.readSource()), index+1, personAndSite.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                            imagePhotographer.setText(string);
+                            imagePhotographer.setMovementMethod(LinkMovementMethod.getInstance());
+
+
+                            imageAttribution.setText(cityScanResults.readLicense());
+
+                            imageCard.setVisibility(View.VISIBLE);
+
+
+                            outputBasicInfo.setText(cityScanResults.readBasicInfo());
+
+                            basicInfoCard.setVisibility(View.VISIBLE);
+
+                            outputSummary.setText(cityScanResults.readSummary());
+                            outputTeleportCityScore.setText(cityScanResults.readTeleportCityScore());
+                            scoreRecViewAdapter.setCityScoresList(cityScanResults.readCityScores());
+
+                            scoresCard.setVisibility(View.VISIBLE);
+                        }
+                    });
+                }
+            });
+
+
+
+
+
+
+            networkImageView.setOnClickListener(v1 -> photoZoomed.show());
+
 
 
             //run()
-            executorService.execute(() -> {
-
-                cityScannerService1.getScanResultsImage(getCityNameInput, new CityScannerService.VolleyImageResponseListener() {
-
-                    @Override
-                    public void onError(String message) {
-                        Toast.makeText(MainActivity.this, "There is a picture error (main)", Toast.LENGTH_LONG).show();
-                    }
-
-                    @Override
-                    public void onResponse(String imgUrl, String photographer, String source, String site, String license) {
-//                            scrollView.scrollTo(0,-1);
-                        networkImageView.setImageUrl(imgUrl, MySingleton.getInstance(MainActivity.this).getImageLoader()); //ImgController from your code.
-                        networkImageViewZoomed.setImageUrl(imgUrl, MySingleton.getInstance(MainActivity.this).getImageLoader());
-
-                        String personAndSite = photographer + "@" + site;
-                        SpannableString string = new SpannableString(personAndSite);
-                        int index = personAndSite.indexOf("@");
-                        string.setSpan(new URLSpan(source), index+1, personAndSite.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-                        imagePhotographer.setText(string);
-                        imagePhotographer.setMovementMethod(LinkMovementMethod.getInstance());
-                        imageAttribution.setText(license);
-
-                    } //onResponse
-
-                }); //get city image
-
-                System.out.println("Task 1 done");
-
-                cityScannerService1.getScanResultsBasicInfo(getCityNameInput, new CityScannerService.VolleyResponseListener() {
-
-                    @Override
-                    public void onError(String message) {
-                        Toast.makeText(MainActivity.this, "There is a basic info error (main)", Toast.LENGTH_LONG).show();
-                    }
-
-                    @Override
-                    public void onResponse(String string) {
-                        outputBasicInfo.setText(string);
-
-                    }
-
-                }); //get city basic info
-
-                System.out.println("Task 2 done");
-
-
-
-
-                cityScannerService1.getScanResultsCityDetails(getCityNameInput, new CityScannerService.VolleyDetailsResponseListener() {
-                    @Override
-                    public void onError(String message) {
-                        Toast.makeText(MainActivity.this, "There is a details error (main)", Toast.LENGTH_LONG).show();
-                    }
-
-                    @Override
-                    public void onResponse(ArrayList<CityDetails> cityDetails) {
-
-
-                        cityScannerService1.getScanResultsScores(getCityNameInput, new CityScannerService.VolleyScoreResponseListener() {
-                            @Override
-                            public void onError(String message) {
-                                Toast.makeText(MainActivity.this, "There is a score error (main)", Toast.LENGTH_LONG).show();
-                            }
-
-                            @Override
-                            public void onResponse(double score, String summary, ArrayList<CityScore> cityScoreBase) {
-
-                                outputSummary.setText(String.valueOf(HtmlCompat.fromHtml(summary,0)));
-
-                                double roundedScore =  Math.round(score*100.0)/100.0;
-                                String scoreString = "Teleport City Score: " + roundedScore;
-                                outputTeleportCityScore.setText(scoreString);
-
-                                if (cityDetails.isEmpty()) {
-                                    System.out.println("empty bruh");
-                                } //check if sortCityDetails is empty
-
-
-                                ArrayList<CityScore> newCityScore = new ArrayList<>();
-
-                                for (int i=0;i<cityScoreBase.size();i++) {
-                                    String name = cityScoreBase.get(i).getName();
-                                    int scoreValue = cityScoreBase.get(i).getScore();
-                                    String color = cityScoreBase.get(i).getColor();
-                                    for (int j=0;j<cityDetails.size();j++) {
-                                        if (cityDetails.get(j).getCityDetailsName().equals(name)) {
-                                            newCityScore.add(new CityScore(name,scoreValue,color,cityDetails.get(j)));
-                                        }
-                                    }
-                                }
-                                scoreRecViewAdapter.setCityScoresList(newCityScore);
-
-
-                            } // onResponse
-
-                        }); //get city scores
-
-
-                    } //onResponse
-
-                }); //get city details
-
-                System.out.println("Task 3 done");
-
-                cityScannerService1.getScanResultsSalaries(getCityNameInput, new CityScannerService.VolleySalaryResponseListener() {
-
-                    @Override
-                    public void onError(String message) {
-
-                    }
-
-                    @Override
-                    public void onResponse(ArrayList<CitySalaries> citySalaries) {
-
-                        citySalariesBase = citySalaries;
-
-                        //-- populate jobSpinner
-                        String[] allJobTitles = new String[citySalariesBase.size()];
-
-                        for (int i=0;i<citySalariesBase.size();i++) {
-                            allJobTitles[i] = citySalariesBase.get(i).getTitle();
-                        }
-
-                        ArrayAdapter<String> adapter = new ArrayAdapter<>(MainActivity.this, R.layout.custom_spinner_layout, allJobTitles);
-                        jobSpinner.setAdapter(adapter);
-
-                        //--
-
-                        //-- show Median Salary & Pyramid Chart
-//                    Pyramid pyramid = AnyChart.pyramid();
-//                    pyramid.legend(false);
-//                    pyramid.tooltip().titleFormat("{%percentile}th Percentile");
-//                    pyramid.tooltip().format("Estimated earnings: ${%salary}");
+//            executorService.execute(() -> {
 //
-//                    anyChartView.setChart(pyramid);
-
-                        pyramid.enabled(true);
-
-                        jobSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                            @Override
-                            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                                //round off values to 2 decimal places
-                                double percentile25th = citySalariesBase.get(position).getPercentile_25();
-                                double percentile50th = citySalariesBase.get(position).getPercentile_50();
-                                double percentile75th = citySalariesBase.get(position).getPercentile_75();
-                                double percentile25thRoundOff = Math.round(percentile25th*100.0)/100.0;
-                                double percentile50thRoundOff = Math.round(percentile50th*100.0)/100.0;
-                                double percentile75thRoundOff = Math.round(percentile75th*100.0)/100.0;
-
-                                //-- show Median Salary for each job
-                                String showMedianSalaryString = SHOW_MEDIAN_SALARY + percentile50thRoundOff;
-                                showMedianSalary.setText(showMedianSalaryString);
-                                //--
-
-                                //--set salary percentiles to pyramid chart
-
-                                List<DataEntry> data = new ArrayList<>();
-
-                                data.add( new CustomDataEntry("What about 75% are making: $" + percentile25thRoundOff,75,25, percentile25thRoundOff));
-                                data.add( new CustomDataEntry("What about 50% are making: $" + percentile50thRoundOff,50,50, percentile50thRoundOff));
-                                data.add( new CustomDataEntry("What about 25% are making: $" + percentile75thRoundOff,25,75, percentile75thRoundOff));
-
-                                pyramid.data(data);
-
-                                //--
-                            }
-
-                            @Override
-                            public void onNothingSelected(AdapterView<?> parent) {
-
-                            }
-                        });
-                        //--
-
-//                            salaryChartCard.setVisibility(View.VISIBLE);
-                    }
-                }); //get city salaries
-
-                System.out.println("Task 4 done");
-
-
-               handler.postDelayed(() -> {
-                   imageCard.setVisibility(View.VISIBLE);
-                   networkImageView.setOnClickListener(v1 -> photoZoomed.show());
-
-                   basicInfoCard.setVisibility(View.VISIBLE);
-                   scoresCard.setVisibility(View.VISIBLE);
-
-                   salaryChartCard.setVisibility(View.VISIBLE);
-               }, 1750);
-
-
-
-
-                scrollView.scrollTo(0,-1);
-                System.out.println("Every service was called");
-
-            }); //executor runnable
+//                cityScannerService1.getScanResultsImage(getCityNameInput, new CityScannerService.VolleyImageResponseListener() {
+//
+//                    @Override
+//                    public void onError(String message) {
+//                        Toast.makeText(MainActivity.this, "There is a picture error (main)", Toast.LENGTH_LONG).show();
+//                    }
+//
+//                    @Override
+//                    public void onResponse(String imgUrl, String photographer, String source, String site, String license) {
+////                            scrollView.scrollTo(0,-1);
+//                        networkImageView.setImageUrl(imgUrl, MySingleton.getInstance(MainActivity.this).getImageLoader()); //ImgController from your code.
+//                        networkImageViewZoomed.setImageUrl(imgUrl, MySingleton.getInstance(MainActivity.this).getImageLoader());
+//
+//                        String personAndSite = photographer + "@" + site;
+//                        SpannableString string = new SpannableString(personAndSite);
+//                        int index = personAndSite.indexOf("@");
+//                        string.setSpan(new URLSpan(source), index+1, personAndSite.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+//                        imagePhotographer.setText(string);
+//                        imagePhotographer.setMovementMethod(LinkMovementMethod.getInstance());
+//                        imageAttribution.setText(license);
+//
+//                    } //onResponse
+//
+//                }); //get city image
+//
+//                System.out.println("Task 1 done");
+//
+//                cityScannerService1.getScanResultsBasicInfo(getCityNameInput, new CityScannerService.VolleyResponseListener() {
+//
+//                    @Override
+//                    public void onError(String message) {
+//                        Toast.makeText(MainActivity.this, "There is a basic info error (main)", Toast.LENGTH_LONG).show();
+//                    }
+//
+//                    @Override
+//                    public void onResponse(String string) {
+//                        outputBasicInfo.setText(string);
+//
+//                    }
+//
+//                }); //get city basic info
+//
+//                System.out.println("Task 2 done");
+//
+//
+//
+//
+//                cityScannerService1.getScanResultsCityDetails(getCityNameInput, new CityScannerService.VolleyDetailsResponseListener() {
+//                    @Override
+//                    public void onError(String message) {
+//                        Toast.makeText(MainActivity.this, "There is a details error (main)", Toast.LENGTH_LONG).show();
+//                    }
+//
+//                    @Override
+//                    public void onResponse(ArrayList<CityDetails> cityDetails) {
+//
+//
+//                        cityScannerService1.getScanResultsScores(getCityNameInput, new CityScannerService.VolleyScoreResponseListener() {
+//                            @Override
+//                            public void onError(String message) {
+//                                Toast.makeText(MainActivity.this, "There is a score error (main)", Toast.LENGTH_LONG).show();
+//                            }
+//
+//                            @Override
+//                            public void onResponse(double score, String summary, ArrayList<CityScore> cityScoreBase) {
+//
+//                                outputSummary.setText(String.valueOf(HtmlCompat.fromHtml(summary,0)));
+//
+//                                double roundedScore =  Math.round(score*100.0)/100.0;
+//                                String scoreString = "Teleport City Score: " + roundedScore;
+//                                outputTeleportCityScore.setText(scoreString);
+//
+//                                if (cityDetails.isEmpty()) {
+//                                    System.out.println("empty bruh");
+//                                } //check if sortCityDetails is empty
+//
+//
+//                                ArrayList<CityScore> newCityScore = new ArrayList<>();
+//
+//                                for (int i=0;i<cityScoreBase.size();i++) {
+//                                    String name = cityScoreBase.get(i).getName();
+//                                    int scoreValue = cityScoreBase.get(i).getScore();
+//                                    String color = cityScoreBase.get(i).getColor();
+//                                    for (int j=0;j<cityDetails.size();j++) {
+//                                        if (cityDetails.get(j).getCityDetailsName().equals(name)) {
+//                                            newCityScore.add(new CityScore(name,scoreValue,color,cityDetails.get(j)));
+//                                        }
+//                                    }
+//                                }
+//                                scoreRecViewAdapter.setCityScoresList(newCityScore);
+//
+//
+//                            } // onResponse
+//
+//                        }); //get city scores
+//
+//
+//                    } //onResponse
+//
+//                }); //get city details
+//
+//                System.out.println("Task 3 done");
+//
+//                cityScannerService1.getScanResultsSalaries(getCityNameInput, new CityScannerService.VolleySalaryResponseListener() {
+//
+//                    @Override
+//                    public void onError(String message) {
+//
+//                    }
+//
+//                    @Override
+//                    public void onResponse(ArrayList<CitySalaries> citySalaries) {
+//
+//                        citySalariesBase = citySalaries;
+//
+//                        //-- populate jobSpinner
+//                        String[] allJobTitles = new String[citySalariesBase.size()];
+//
+//                        for (int i=0;i<citySalariesBase.size();i++) {
+//                            allJobTitles[i] = citySalariesBase.get(i).getTitle();
+//                        }
+//
+//                        ArrayAdapter<String> adapter = new ArrayAdapter<>(MainActivity.this, R.layout.custom_spinner_layout, allJobTitles);
+//                        jobSpinner.setAdapter(adapter);
+//
+//                        //--
+//
+//                        //-- show Median Salary & Pyramid Chart
+////                    Pyramid pyramid = AnyChart.pyramid();
+////                    pyramid.legend(false);
+////                    pyramid.tooltip().titleFormat("{%percentile}th Percentile");
+////                    pyramid.tooltip().format("Estimated earnings: ${%salary}");
+////
+////                    anyChartView.setChart(pyramid);
+//
+//                        pyramid.enabled(true);
+//
+//                        jobSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+//                            @Override
+//                            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+//                                //round off values to 2 decimal places
+//                                double percentile25th = citySalariesBase.get(position).getPercentile_25();
+//                                double percentile50th = citySalariesBase.get(position).getPercentile_50();
+//                                double percentile75th = citySalariesBase.get(position).getPercentile_75();
+//                                double percentile25thRoundOff = Math.round(percentile25th*100.0)/100.0;
+//                                double percentile50thRoundOff = Math.round(percentile50th*100.0)/100.0;
+//                                double percentile75thRoundOff = Math.round(percentile75th*100.0)/100.0;
+//
+//                                //-- show Median Salary for each job
+//                                String showMedianSalaryString = SHOW_MEDIAN_SALARY + percentile50thRoundOff;
+//                                showMedianSalary.setText(showMedianSalaryString);
+//                                //--
+//
+//                                //--set salary percentiles to pyramid chart
+//
+//                                List<DataEntry> data = new ArrayList<>();
+//
+//                                data.add( new CustomDataEntry("What about 75% are making: $" + percentile25thRoundOff,75,25, percentile25thRoundOff));
+//                                data.add( new CustomDataEntry("What about 50% are making: $" + percentile50thRoundOff,50,50, percentile50thRoundOff));
+//                                data.add( new CustomDataEntry("What about 25% are making: $" + percentile75thRoundOff,25,75, percentile75thRoundOff));
+//
+//                                pyramid.data(data);
+//
+//                                //--
+//                            }
+//
+//                            @Override
+//                            public void onNothingSelected(AdapterView<?> parent) {
+//
+//                            }
+//                        });
+//                        //--
+//
+////                            salaryChartCard.setVisibility(View.VISIBLE);
+//                    }
+//                }); //get city salaries
+//
+//                System.out.println("Task 4 done");
+//
+//
+//               handler.postDelayed(() -> {
+//                   imageCard.setVisibility(View.VISIBLE);
+//                   networkImageView.setOnClickListener(v1 -> photoZoomed.show());
+//
+//                   basicInfoCard.setVisibility(View.VISIBLE);
+//                   scoresCard.setVisibility(View.VISIBLE);
+//
+//                   salaryChartCard.setVisibility(View.VISIBLE);
+//               }, 1750);
+//
+//
+//
+//
+//                scrollView.scrollTo(0,-1);
+//                System.out.println("Every service was called");
+//
+//            }); //executor runnable
 
         }); //btnScan OnClickListener
     } //OnCreate
+
 
 
     @Override
@@ -425,4 +492,5 @@ public class MainActivity extends AppCompatActivity {
             });
         }
     } //onResume
+
 }

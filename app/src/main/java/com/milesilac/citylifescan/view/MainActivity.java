@@ -1,57 +1,51 @@
-package com.milesilac.citylifescan;
+package com.milesilac.citylifescan.view;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.text.HtmlCompat;
-import androidx.core.widget.NestedScrollView;
 import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import android.app.Dialog;
-import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.text.Editable;
 import android.text.SpannableString;
 import android.text.Spanned;
+import android.text.TextWatcher;
 import android.text.method.LinkMovementMethod;
 import android.text.style.URLSpan;
 import android.view.View;
 import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.AutoCompleteTextView;
-import android.widget.Button;
-import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.android.volley.toolbox.NetworkImageView;
 import com.anychart.AnyChart;
-import com.anychart.AnyChartView;
 import com.anychart.chart.common.dataentry.DataEntry;
 import com.anychart.charts.Pyramid;
 
-import com.google.android.material.card.MaterialCardView;
-import com.milesilac.citylifescan.model.CityDataRepository;
+import com.milesilac.citylifescan.CityContract;
+import com.milesilac.citylifescan.CityDetails;
+import com.milesilac.citylifescan.CitySalaries;
+import com.milesilac.citylifescan.CityScanResults;
+import com.milesilac.citylifescan.CityScannerService;
+import com.milesilac.citylifescan.CityScore;
+import com.milesilac.citylifescan.CustomDataEntry;
+import com.milesilac.citylifescan.MySingleton;
+import com.milesilac.citylifescan.R;
+import com.milesilac.citylifescan.ScoreRecViewAdapter;
+import com.milesilac.citylifescan.databinding.ActivityMainBinding;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class MainActivity extends AppCompatActivity implements CityContract.View {
 
-
-
-    Button btnScan;
-    AutoCompleteTextView inputCity;
-    TextView outputBasicInfo, outputSummary, outputTeleportCityScore, showMedianSalary, imagePhotographer, imageAttribution;
-    NetworkImageView networkImageView, networkImageViewZoomed;
-    RecyclerView scoresRecView;
-    NestedScrollView scrollView;
-    MaterialCardView imageCard, basicInfoCard, scoresCard, salaryChartCard;
-    AnyChartView anyChartView;
-    Spinner jobSpinner;
+    TextView imagePhotographer, imageAttribution;
+    NetworkImageView networkImageViewZoomed;
     Dialog photoZoomed;
 
     public static final String SHOW_MEDIAN_SALARY = "MEDIAN SALARY: $";
@@ -68,34 +62,16 @@ public class MainActivity extends AppCompatActivity implements CityContract.View
     String source = null;
     String license = null;
 
+    private ActivityMainBinding binding;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-
-        //init mainActivity elements
-        btnScan = findViewById(R.id.btnScan);
-        inputCity = findViewById(R.id.inputCity);
-        outputBasicInfo = findViewById(R.id.outputBasicInfo);
-        outputSummary = findViewById(R.id.outputSummary);
-        outputTeleportCityScore = findViewById(R.id.outputTeleportCityScore);
-        showMedianSalary = findViewById(R.id.showMedianSalary);
-        networkImageView = findViewById(R.id.photo);
-        scoresRecView = findViewById(R.id.scoresRecView);
-        scrollView = findViewById(R.id.outputScrollView);
-        jobSpinner = findViewById(R.id.jobSpinner);
-
-
-
-        //init MaterialCardViews
-        imageCard = findViewById(R.id.imageCard);
-        basicInfoCard = findViewById(R.id.basicInfoCard);
-        scoresCard = findViewById(R.id.scoresCard);
-        salaryChartCard = findViewById(R.id.pyramidChartCard);
+        binding = ActivityMainBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
 
         //set default networkImageView
-        networkImageView.setDefaultImageResId(R.drawable.ic_launcher_foreground);
+        binding.photo.setDefaultImageResId(R.drawable.ic_launcher_foreground);
 
         //setup networkImageView dialog
         photoZoomed = new Dialog(this);
@@ -110,17 +86,14 @@ public class MainActivity extends AppCompatActivity implements CityContract.View
 
         //set RecyclerViewAdapter
         ScoreRecViewAdapter scoreRecViewAdapter = new ScoreRecViewAdapter(this);
-        scoresRecView.setAdapter(scoreRecViewAdapter);
-        scoresRecView.setLayoutManager(new LinearLayoutManager(this));
-
-        //set AnyChart view
-        anyChartView = findViewById(R.id.pyramidChart);
+        binding.scoresRecView.setAdapter(scoreRecViewAdapter);
+        binding.scoresRecView.setLayoutManager(new LinearLayoutManager(this));
 
         //empty screen on initialization
-        imageCard.setVisibility(View.INVISIBLE);
-        basicInfoCard.setVisibility(View.INVISIBLE);
-        scoresCard.setVisibility(View.INVISIBLE);
-        salaryChartCard.setVisibility(View.INVISIBLE);
+        binding.imageCard.setVisibility(View.INVISIBLE);
+        binding.basicInfoCard.setVisibility(View.INVISIBLE);
+        binding.scoresCard.setVisibility(View.INVISIBLE);
+        binding.pyramidChartCard.setVisibility(View.INVISIBLE);
 
         CityScanResults cityScanResults = new CityScanResults(this);
 
@@ -134,8 +107,8 @@ public class MainActivity extends AppCompatActivity implements CityContract.View
             @Override
             public void onResponse(String[] names) {
                 ArrayAdapter<String> adapter = new ArrayAdapter<>(MainActivity.this, R.layout.autocomplete_layout, names);
-                inputCity.setThreshold(1);
-                inputCity.setAdapter(adapter);
+                binding.inputCity.setThreshold(1);
+                binding.inputCity.setAdapter(adapter);
             }
 
         }); //checkCityName
@@ -149,62 +122,77 @@ public class MainActivity extends AppCompatActivity implements CityContract.View
 
 
 
-        //btnScan OnClick
-        btnScan.setOnClickListener(v -> {
-            imageCard.setVisibility(View.INVISIBLE);
-            basicInfoCard.setVisibility(View.INVISIBLE);
-            scoresCard.setVisibility(View.INVISIBLE);
-            salaryChartCard.setVisibility(View.INVISIBLE);
+        binding.inputCity.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
-            cityScanResults.getScanResults(inputCity.getText().toString());
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (count > 3) {
+                    System.out.println("ontextchanged is called");
+                    cityScanResults.getScanResults(binding.inputCity.getText().toString());
+
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+
+
+
+
+        binding.btnScan.setOnClickListener(v -> {
+            binding.imageCard.setVisibility(View.INVISIBLE);
+            binding.basicInfoCard.setVisibility(View.INVISIBLE);
+            binding.scoresCard.setVisibility(View.INVISIBLE);
+            binding.pyramidChartCard.setVisibility(View.INVISIBLE);
+
+//            cityScanResults.getScanResults(binding.inputCity.getText().toString());
             CityScannerService cityScannerService1 = new CityScannerService(MainActivity.this);
 
-            executorService.execute(new Runnable() {
-                @Override
-                public void run() {
+            executorService.execute(() -> {
+                
+                while (checkImageDataArray == cityScanResults.readImageDataArray()) { }
+                while (Objects.equals(checkBasicInfo, cityScanResults.readBasicInfo())) { }
+                while (checkCityScores == cityScanResults.readCityScores()) { }
+
+                checkImageDataArray = cityScanResults.readImageDataArray();
+                checkBasicInfo = cityScanResults.readBasicInfo();
+                checkCityScores = cityScanResults.readCityScores();
+
+                handler.post(() -> {
+                    binding.photo.setImageUrl(cityScanResults.readImgUrl(), MySingleton.getInstance(MainActivity.this).getImageLoader()); //ImgController from your code.
+                    networkImageViewZoomed.setImageUrl(cityScanResults.readImgUrl(), MySingleton.getInstance(MainActivity.this).getImageLoader());
 
 
-
-                    while (checkImageDataArray == cityScanResults.readImageDataArray()) { }
-                    while (checkBasicInfo == cityScanResults.readBasicInfo()) { }
-                    while (checkCityScores == cityScanResults.readCityScores()) { }
-
-                    checkImageDataArray = cityScanResults.readImageDataArray();
-                    checkBasicInfo = cityScanResults.readBasicInfo();
-                    checkCityScores = cityScanResults.readCityScores();
-
-                    handler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            networkImageView.setImageUrl(cityScanResults.readImgUrl(), MySingleton.getInstance(MainActivity.this).getImageLoader()); //ImgController from your code.
-                            networkImageViewZoomed.setImageUrl(cityScanResults.readImgUrl(), MySingleton.getInstance(MainActivity.this).getImageLoader());
+                    String personAndSite = cityScanResults.readPhotographer() + "@" + cityScanResults.readSite();
+                    SpannableString string = new SpannableString(personAndSite);
+                    int index = personAndSite.indexOf("@");
+                    string.setSpan(new URLSpan(cityScanResults.readSource()), index+1, personAndSite.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                    imagePhotographer.setText(string);
+                    imagePhotographer.setMovementMethod(LinkMovementMethod.getInstance());
 
 
-                            String personAndSite = cityScanResults.readPhotographer() + "@" + cityScanResults.readSite();
-                            SpannableString string = new SpannableString(personAndSite);
-                            int index = personAndSite.indexOf("@");
-                            string.setSpan(new URLSpan(cityScanResults.readSource()), index+1, personAndSite.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-                            imagePhotographer.setText(string);
-                            imagePhotographer.setMovementMethod(LinkMovementMethod.getInstance());
+                    imageAttribution.setText(cityScanResults.readLicense());
+
+                    binding.imageCard.setVisibility(View.VISIBLE);
 
 
-                            imageAttribution.setText(cityScanResults.readLicense());
+                    binding.outputBasicInfo.setText(cityScanResults.readBasicInfo());
 
-                            imageCard.setVisibility(View.VISIBLE);
+                    binding.basicInfoCard.setVisibility(View.VISIBLE);
 
+                    binding.outputSummary.setText(cityScanResults.readSummary());
+                    binding.outputTeleportCityScore.setText(cityScanResults.readTeleportCityScore());
+                    scoreRecViewAdapter.setCityScoresList(cityScanResults.readCityScores());
 
-                            outputBasicInfo.setText(cityScanResults.readBasicInfo());
-
-                            basicInfoCard.setVisibility(View.VISIBLE);
-
-                            outputSummary.setText(cityScanResults.readSummary());
-                            outputTeleportCityScore.setText(cityScanResults.readTeleportCityScore());
-                            scoreRecViewAdapter.setCityScoresList(cityScanResults.readCityScores());
-
-                            scoresCard.setVisibility(View.VISIBLE);
-                        }
-                    });
-                }
+                    binding.scoresCard.setVisibility(View.VISIBLE);
+                });
             });
 
 
@@ -212,7 +200,7 @@ public class MainActivity extends AppCompatActivity implements CityContract.View
 
 
 
-            networkImageView.setOnClickListener(v1 -> photoZoomed.show());
+            binding.photo.setOnClickListener(v1 -> photoZoomed.show());
 
 
 
@@ -228,8 +216,8 @@ public class MainActivity extends AppCompatActivity implements CityContract.View
 //
 //                    @Override
 //                    public void onResponse(String imgUrl, String photographer, String source, String site, String license) {
-////                            scrollView.scrollTo(0,-1);
-//                        networkImageView.setImageUrl(imgUrl, MySingleton.getInstance(MainActivity.this).getImageLoader()); //ImgController from your code.
+////                            binding.outputScrollView.scrollTo(0,-1);
+//                        binding.photo.setImageUrl(imgUrl, MySingleton.getInstance(MainActivity.this).getImageLoader()); //ImgController from your code.
 //                        networkImageViewZoomed.setImageUrl(imgUrl, MySingleton.getInstance(MainActivity.this).getImageLoader());
 //
 //                        String personAndSite = photographer + "@" + site;
@@ -255,7 +243,7 @@ public class MainActivity extends AppCompatActivity implements CityContract.View
 //
 //                    @Override
 //                    public void onResponse(String string) {
-//                        outputBasicInfo.setText(string);
+//                        binding.outputBasicInfo.setText(string);
 //
 //                    }
 //
@@ -285,11 +273,11 @@ public class MainActivity extends AppCompatActivity implements CityContract.View
 //                            @Override
 //                            public void onResponse(double score, String summary, ArrayList<CityScore> cityScoreBase) {
 //
-//                                outputSummary.setText(String.valueOf(HtmlCompat.fromHtml(summary,0)));
+//                                binding.outputSummary.setText(String.valueOf(HtmlCompat.fromHtml(summary,0)));
 //
 //                                double roundedScore =  Math.round(score*100.0)/100.0;
 //                                String scoreString = "Teleport City Score: " + roundedScore;
-//                                outputTeleportCityScore.setText(scoreString);
+//                                binding.outputTeleportCityScore.setText(scoreString);
 //
 //                                if (cityDetails.isEmpty()) {
 //                                    System.out.println("empty bruh");
@@ -342,7 +330,7 @@ public class MainActivity extends AppCompatActivity implements CityContract.View
 //                        }
 //
 //                        ArrayAdapter<String> adapter = new ArrayAdapter<>(MainActivity.this, R.layout.custom_spinner_layout, allJobTitles);
-//                        jobSpinner.setAdapter(adapter);
+//                        binding.jobSpinner.setAdapter(adapter);
 //
 //                        //--
 //
@@ -352,11 +340,11 @@ public class MainActivity extends AppCompatActivity implements CityContract.View
 ////                    pyramid.tooltip().titleFormat("{%percentile}th Percentile");
 ////                    pyramid.tooltip().format("Estimated earnings: ${%salary}");
 ////
-////                    anyChartView.setChart(pyramid);
+////                    binding.pyramidChart.setChart(pyramid);
 //
 //                        pyramid.enabled(true);
 //
-//                        jobSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+//                        binding.jobSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
 //                            @Override
 //                            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 //                                //round off values to 2 decimal places
@@ -369,7 +357,7 @@ public class MainActivity extends AppCompatActivity implements CityContract.View
 //
 //                                //-- show Median Salary for each job
 //                                String showMedianSalaryString = SHOW_MEDIAN_SALARY + percentile50thRoundOff;
-//                                showMedianSalary.setText(showMedianSalaryString);
+//                                binding.showMedianSalary.setText(showMedianSalaryString);
 //                                //--
 //
 //                                //--set salary percentiles to pyramid chart
@@ -392,7 +380,7 @@ public class MainActivity extends AppCompatActivity implements CityContract.View
 //                        });
 //                        //--
 //
-////                            salaryChartCard.setVisibility(View.VISIBLE);
+////                            binding.pyramidChartCard.setVisibility(View.VISIBLE);
 //                    }
 //                }); //get city salaries
 //
@@ -400,24 +388,24 @@ public class MainActivity extends AppCompatActivity implements CityContract.View
 //
 //
 //               handler.postDelayed(() -> {
-//                   imageCard.setVisibility(View.VISIBLE);
-//                   networkImageView.setOnClickListener(v1 -> photoZoomed.show());
+//                   binding.imageCard.setVisibility(View.VISIBLE);
+//                   binding.photo.setOnClickListener(v1 -> photoZoomed.show());
 //
-//                   basicInfoCard.setVisibility(View.VISIBLE);
-//                   scoresCard.setVisibility(View.VISIBLE);
+//                   binding.basicInfoCard.setVisibility(View.VISIBLE);
+//                   binding.scoresCard.setVisibility(View.VISIBLE);
 //
-//                   salaryChartCard.setVisibility(View.VISIBLE);
+//                   binding.pyramidChartCard.setVisibility(View.VISIBLE);
 //               }, 1750);
 //
 //
 //
 //
-//                scrollView.scrollTo(0,-1);
+//                binding.outputScrollView.scrollTo(0,-1);
 //                System.out.println("Every service was called");
 //
 //            }); //executor runnable
 
-        }); //btnScan OnClickListener
+        });
     } //OnCreate
 
 
@@ -433,7 +421,7 @@ public class MainActivity extends AppCompatActivity implements CityContract.View
         pyramid.tooltip().format("Estimated earnings: ${%salary}");
         pyramid.enabled(false);
 
-        anyChartView.setChart(pyramid);
+        binding.pyramidChart.setChart(pyramid);
 
         if (citySalariesBase != null) {
             pyramid.enabled(true);
@@ -445,7 +433,7 @@ public class MainActivity extends AppCompatActivity implements CityContract.View
             }
 
             ArrayAdapter<String> adapter = new ArrayAdapter<>(MainActivity.this, R.layout.custom_spinner_layout, allJobTitles);
-            jobSpinner.setAdapter(adapter);
+            binding.jobSpinner.setAdapter(adapter);
             //--
 
             //-- show Median Salary & Pyramid Chart
@@ -454,9 +442,9 @@ public class MainActivity extends AppCompatActivity implements CityContract.View
 //            pyramid.tooltip().titleFormat("{%percentile}th Percentile");
 //            pyramid.tooltip().format("Estimated earnings: ${%salary}");
 //
-//            anyChartView.setChart(pyramid);
+//            binding.pyramidChart.setChart(pyramid);
 
-            jobSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            binding.jobSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                 @Override
                 public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                     //round off values to 2 decimal places
@@ -469,7 +457,7 @@ public class MainActivity extends AppCompatActivity implements CityContract.View
 
                     //-- show Median Salary for each job
                     String showMedianSalaryString = SHOW_MEDIAN_SALARY + percentile50thRoundOff;
-                    showMedianSalary.setText(showMedianSalaryString);
+                    binding.showMedianSalary.setText(showMedianSalaryString);
                     //--
 
                     //--set salary percentiles to pyramid chart

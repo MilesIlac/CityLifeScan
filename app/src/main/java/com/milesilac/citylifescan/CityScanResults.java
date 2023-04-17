@@ -17,12 +17,10 @@ public class CityScanResults implements CityContract.CityScanResults {
 
     Context context;
 
-    public CityScanResults(Context context) {
+    public CityScanResults(Context context, CityScannerService cityScannerService) {
         this.context = context;
-        cityScannerService = new CityScannerService(context);
+        this.cityScannerService = cityScannerService;
     }
-
-
 
     public void getScanResults(String cityName) {
 

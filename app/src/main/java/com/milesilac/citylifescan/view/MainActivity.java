@@ -95,10 +95,9 @@ public class MainActivity extends AppCompatActivity implements CityContract.View
         binding.scoresCard.setVisibility(View.INVISIBLE);
         binding.pyramidChartCard.setVisibility(View.INVISIBLE);
 
-        CityScanResults cityScanResults = new CityScanResults(this);
+        CityScannerService cityScannerService = new CityScannerService(this);
+        CityScanResults cityScanResults = new CityScanResults(this, cityScannerService);
 
-        //populate autocomplete
-        CityScannerService cityScannerService = new CityScannerService(MainActivity.this);
         cityScannerService.checkCityName(new CityScannerService.VolleyArrayResponseListener() {
             @Override
             public void onError(String message) {

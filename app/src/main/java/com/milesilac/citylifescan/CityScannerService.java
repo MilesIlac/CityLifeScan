@@ -25,11 +25,7 @@ public class CityScannerService implements VolleyListeners {
 
     public CityScannerService(Context context) { this.context = context; }
 
-
-
-
-    //provide image on button click
-    public void getScanResultsImage(String cityName, VolleyImageResponseListener volleyImageResponseListener) {
+    private String formatCityName(String cityName) {
         cityName = cityName.toLowerCase();
         if (cityName.contains(", ")) {
             cityName = cityName.replace(", ","-");
@@ -43,7 +39,11 @@ public class CityScannerService implements VolleyListeners {
         if (cityName.contains(".")) {
             cityName = cityName.replace(".","");
         }
-        String url = QUERY_FOR_CITY_NAME + cityName + QUERY_FOR_CITY_IMAGE;
+        return cityName;
+    }
+
+    public void getScanResultsImage(String cityName, VolleyImageResponseListener volleyImageResponseListener) {
+        String url = QUERY_FOR_CITY_NAME + formatCityName(cityName) + QUERY_FOR_CITY_IMAGE;
 
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url, null , response -> {
             JSONArray photos;
@@ -86,23 +86,8 @@ public class CityScannerService implements VolleyListeners {
     } //getScanResultsImage
 
 
-    //provide basic info on button click
     public void getScanResultsBasicInfo(String cityName, VolleyResponseListener volleyResponseListener) {
-        cityName = cityName.toLowerCase();
-        if (cityName.contains(", ")) {
-            cityName = cityName.replace(", ","-");
-        }
-        else if (cityName.contains(". ")) {
-            cityName = cityName.replace(". ","-");
-        }
-        else if (cityName.contains(" ")) {
-            cityName = cityName.replace(" ","-");
-        }
-        if (cityName.contains(".")) {
-            cityName = cityName.replace(".","");
-        }
-
-        String url = QUERY_FOR_CITY_NAME + cityName + "/";
+        String url = QUERY_FOR_CITY_NAME + formatCityName(cityName) + "/";
 
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url, null , response -> {
             String fullName = "";
@@ -136,23 +121,8 @@ public class CityScannerService implements VolleyListeners {
     } //getScanResultsBasicInfo
 
 
-    //provide Scores on button click
     public void getScanResultsScores(String cityName, VolleyScoreResponseListener volleyScoreResponseListener)  {
-        cityName = cityName.toLowerCase();
-        if (cityName.contains(", ")) {
-            cityName = cityName.replace(", ","-");
-        }
-        else if (cityName.contains(". ")) {
-            cityName = cityName.replace(". ","-");
-        }
-        else if (cityName.contains(" ")) {
-            cityName = cityName.replace(" ","-");
-        }
-        if (cityName.contains(".")) {
-            cityName = cityName.replace(".","");
-        }
-
-        String url = QUERY_FOR_CITY_NAME + cityName + QUERY_FOR_CITY_SCORES;
+        String url = QUERY_FOR_CITY_NAME + formatCityName(cityName) + QUERY_FOR_CITY_SCORES;
 
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url, null , response -> {
             double teleport_city_score = 0;
@@ -192,23 +162,8 @@ public class CityScannerService implements VolleyListeners {
     } //getScanResultsScores
 
 
-    //provide Salaries on button click
     public void getScanResultsSalaries(String cityName, VolleySalaryResponseListener volleySalaryResponseListener) {
-        cityName = cityName.toLowerCase();
-        if (cityName.contains(", ")) {
-            cityName = cityName.replace(", ","-");
-        }
-        else if (cityName.contains(". ")) {
-            cityName = cityName.replace(". ","-");
-        }
-        else if (cityName.contains(" ")) {
-            cityName = cityName.replace(" ","-");
-        }
-        if (cityName.contains(".")) {
-            cityName = cityName.replace(".","");
-        }
-
-        String url = QUERY_FOR_CITY_NAME + cityName + QUERY_FOR_CITY_SALARIES;
+        String url = QUERY_FOR_CITY_NAME + formatCityName(cityName) + QUERY_FOR_CITY_SALARIES;
 
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url, null , response -> {
             JSONArray salaries;
@@ -294,25 +249,8 @@ public class CityScannerService implements VolleyListeners {
     } //checkCityName
 
 
-
-
-    //provide Details on button click
     public void getScanResultsCityDetails(String cityName, VolleyDetailsResponseListener volleyDetailsResponseListener) {
-        cityName = cityName.toLowerCase();
-        if (cityName.contains(", ")) {
-            cityName = cityName.replace(", ","-");
-        }
-        else if (cityName.contains(". ")) {
-            cityName = cityName.replace(". ","-");
-        }
-        else if (cityName.contains(" ")) {
-            cityName = cityName.replace(" ","-");
-        }
-        if (cityName.contains(".")) {
-            cityName = cityName.replace(".","");
-        }
-
-        String url = QUERY_FOR_CITY_NAME + cityName + QUERY_FOR_CITY_DETAILS;
+        String url = QUERY_FOR_CITY_NAME + formatCityName(cityName) + QUERY_FOR_CITY_DETAILS;
 
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url, null , response -> {
             JSONArray categories;
@@ -387,6 +325,5 @@ public class CityScannerService implements VolleyListeners {
         System.out.println("Scores queue start");
 
     } //getScanResultsDetails
-
 
 }

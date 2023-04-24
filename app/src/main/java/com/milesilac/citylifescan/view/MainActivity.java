@@ -98,19 +98,19 @@ public class MainActivity extends AppCompatActivity implements CityContract.View
         CityScannerService cityScannerService = new CityScannerService(this);
         CityScanResults cityScanResults = new CityScanResults(this, cityScannerService);
 
-        cityScannerService.checkCityName(new CityScannerService.VolleyArrayResponseListener() {
-            @Override
-            public void onError(String message) {
-            }
-
-            @Override
-            public void onResponse(String[] names) {
-                ArrayAdapter<String> adapter = new ArrayAdapter<>(MainActivity.this, R.layout.autocomplete_layout, names);
-                binding.inputCity.setThreshold(1);
-                binding.inputCity.setAdapter(adapter);
-            }
-
-        }); //checkCityName
+//        cityScannerService.checkCityName(new CityScannerService.VolleyArrayResponseListener() {
+//            @Override
+//            public void onError(String message) {
+//            }
+//
+//            @Override
+//            public void onResponse(String[] names) {
+//                ArrayAdapter<String> adapter = new ArrayAdapter<>(MainActivity.this, R.layout.autocomplete_layout, names);
+//                binding.inputCity.setThreshold(1);
+//                binding.inputCity.setAdapter(adapter);
+//            }
+//
+//        }); //checkCityName
 
 
         pyramid = AnyChart.pyramid();

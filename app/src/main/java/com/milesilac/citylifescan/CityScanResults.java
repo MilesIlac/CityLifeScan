@@ -5,7 +5,12 @@ import android.content.Context;
 
 import androidx.core.text.HtmlCompat;
 
+import com.android.volley.VolleyError;
 import com.milesilac.citylifescan.model.CityDataRepository;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 
@@ -22,134 +27,305 @@ public class CityScanResults implements CityContract.CityScanResults {
         this.cityScannerService = cityScannerService;
     }
 
+    public void checkCityName() {
+        cityScannerService.checkCityName(new VolleyListeners.VolleyJSONResponseListener() {
+            @Override
+            public void onResponse(JSONObject jsonObject) {
+                JSONObject links;
+                JSONArray urbanAreas;
+                JSONObject getName;
+                ArrayList<String> names = new ArrayList<>();
+
+
+                try {
+                    links = jsonObject.getJSONObject("_links");
+                    urbanAreas = links.getJSONArray("ua:item");
+                    for (int i=0;i<urbanAreas.length();i++) {
+                        getName = urbanAreas.getJSONObject(i);
+                        names.add(getName.getString("name"));
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    System.out.println("City name stack trace out");
+                }
+
+
+                String[] countryNames = new String[names.size()];
+                for (int i=0;i<names.size();i++) {
+                    countryNames[i] = names.get(i);
+                }
+            }
+
+            @Override
+            public void onError(VolleyError error) {
+
+            }
+        });
+    }
+
     public void getScanResults(String cityName) {
 
-        cityScannerService.getScanResultsImage(cityName, new CityScannerService.VolleyImageResponseListener() {
+        cityScannerService.getScanResultsImage(cityName, new VolleyListeners.VolleyJSONResponseListener() {
 
             @Override
-            public void onError(String message) {
-//                Toast.makeText(MainActivity.this, "There is a picture error (main)", Toast.LENGTH_LONG).show();
-            }
+            public void onResponse(JSONObject jsonObject) {
+                JSONArray photos;
+                JSONObject image;
+                JSONObject attribution;
+                String imageURL = "";
+                String photographer = "";
+                String source = "";
+                String site = "";
+                String license = "";
 
-            @Override
-            public void onResponse(String imgUrl, String photographer, String source, String site, String license) {
-                System.out.println("This is working. Proof: " + photographer);
+                try {
+                    photos = jsonObject.getJSONArray("photos");
+                    JSONObject getImage = photos.getJSONObject(0);
+                    //get image
+                    image = getImage.getJSONObject("image");
+                    imageURL = image.getString("mobile");
+                    //get attribution details
+                    attribution = getImage.getJSONObject("attribution");
+                    photographer = attribution.getString("photographer");
+                    source = attribution.getString("source");
+                    site = attribution.getString("site");
+                    license =attribution.getString("license");
 
-                String[] imageData = {imgUrl,photographer,source,site,license};
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    System.out.println("Image stack trace out");
+                }
 
+                String[] imageData = {imageURL,photographer,source,site,license};
                 cityDataRepository.setImageData(imageData);
-
-            } //onResponse
-
-        }); //get city image
-
-
-
-        cityScannerService.getScanResultsBasicInfo(cityName, new CityScannerService.VolleyResponseListener() {
-
-            @Override
-            public void onError(String message) {
-//                Toast.makeText(MainActivity.this, "There is a basic info error (main)", Toast.LENGTH_LONG).show();
             }
 
             @Override
-            public void onResponse(String string) {
+            public void onError(VolleyError error) {
 
-                cityDataRepository.setBasicInfo(string);
             }
 
-        }); //get city basic info
+        });
 
+        cityScannerService.getScanResultsBasicInfo(cityName, new VolleyListeners.VolleyJSONResponseListener() {
 
-        cityScannerService.getScanResultsCityDetails(cityName, new CityScannerService.VolleyDetailsResponseListener() {
             @Override
-            public void onError(String message) {
-//                Toast.makeText(MainActivity.this, "There is a details error (main)", Toast.LENGTH_LONG).show();
+            public void onResponse(JSONObject jsonObject) {
+                String fullName = "";
+                String continent = "";
+                String currentMayor = "";
+
+                try {
+                    fullName = jsonObject.getString("full_name");
+                    continent = jsonObject.getString("continent");
+                    currentMayor = jsonObject.getString("mayor");
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    System.out.println("Basic Info stack trace out");
+                }
+
+                String outputInfo = "Full name: " + fullName + "\n" +
+                        "Continent name: " + continent + "\n" +
+                        "Current Mayor: " + currentMayor + "\n";
+
+                cityDataRepository.setBasicInfo(outputInfo);
             }
 
             @Override
-            public void onResponse(ArrayList<CityDetails> cityDetails) {
+            public void onError(VolleyError error) {
+
+            }
+
+        });
+
+
+        cityScannerService.getScanResultsCityDetails(cityName, new VolleyListeners.VolleyJSONResponseListener() {
+            @Override
+            public void onResponse(JSONObject jsonObject) {
+                JSONArray categories;
+                JSONObject forEachScore;
+                String scoreDetailLabel;
+                JSONArray data;
+                JSONObject forEachData;
+                String dataObjectName;
+                String dataObjectType;
+                double dataObjectDecimal;
+                String dataObjectString;
+                int dataObjectInt;
+
+
+                ArrayList<CityDetails> cityDetails = new ArrayList<>();
+                ArrayList<CityDetailsData> cityDetailsData = new ArrayList<>();
+
+                try {
+                    categories = jsonObject.getJSONArray("categories");
+                    for (int i=0;i<categories.length();i++) {
+                        forEachScore = categories.getJSONObject(i); //get each score
+                        scoreDetailLabel = forEachScore.getString("label"); //get each score name
+
+                        data = forEachScore.getJSONArray("data"); //get data array
+                        for (int j=0;j<data.length();j++) { //scan through data array
+                            forEachData = data.getJSONObject(j); //declare array element object
+                            dataObjectName = forEachData.getString("label");
+                            dataObjectType = forEachData.getString("type");
+                            if (dataObjectType.equals("float")) {
+                                dataObjectDecimal = forEachData.getDouble("float_value");
+                                cityDetailsData.add(new CityDetailsData(scoreDetailLabel,dataObjectName,dataObjectType,dataObjectDecimal)); //put each value in an array element, equivalent to one jsonobject
+                            }
+                            if (dataObjectType.equals("percent")) {
+                                dataObjectDecimal = forEachData.getDouble("percent_value");
+                                cityDetailsData.add(new CityDetailsData(scoreDetailLabel,dataObjectName,dataObjectType,dataObjectDecimal));
+                            }
+                            if (dataObjectType.equals("currency_dollar")) {
+                                dataObjectDecimal = forEachData.getDouble("currency_dollar_value");
+                                cityDetailsData.add(new CityDetailsData(scoreDetailLabel,dataObjectName,dataObjectType,dataObjectDecimal));
+                            }
+                            if (dataObjectType.equals("string")) {
+                                dataObjectString = forEachData.getString("string_value");
+                                cityDetailsData.add(new CityDetailsData(scoreDetailLabel,dataObjectName,dataObjectType,dataObjectString));
+                            }
+                            if (dataObjectType.equals("url")) {
+                                dataObjectString = forEachData.getString("url_value");
+                                cityDetailsData.add(new CityDetailsData(scoreDetailLabel,dataObjectName,dataObjectType,dataObjectString));
+
+                            }
+                            if (dataObjectType.equals("int")) {
+                                dataObjectInt = forEachData.getInt("int_value");
+                                cityDetailsData.add(new CityDetailsData(scoreDetailLabel,dataObjectName,dataObjectType,dataObjectInt));
+                            }
+
+                        }
+                        cityDetails.add(new CityDetails(scoreDetailLabel,cityDetailsData)); //no output
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    System.out.println("Scores stack trace out");
+                }
 
                 cityDataRepository.setCityDetailsData(cityDetails);
-
-                cityScannerService.getScanResultsScores(cityName, new CityScannerService.VolleyScoreResponseListener() {
-                    @Override
-                    public void onError(String message) {
-//                        Toast.makeText(MainActivity.this, "There is a score error (main)", Toast.LENGTH_LONG).show();
-                    }
-
-                    @Override
-                    public void onResponse(double score, String summary, ArrayList<CityScore> cityScoreBase) {
-
-                        String summaryString = String.valueOf(HtmlCompat.fromHtml(summary,0));
-                        cityDataRepository.setCitySummary(summaryString);
-
-                        double roundedScore =  Math.round(score*100.0)/100.0;
-                        String scoreString = "Teleport City Score: " + roundedScore;
-                        cityDataRepository.setCityTeleportScore(scoreString);
-
-
-                        if (cityDataRepository.getCityDetailsData().isEmpty()) {
-                            System.out.println("empty bruh");
-                        } //check if sortCityDetails is empty
-
-
-                        ArrayList<CityScore> newCityScore = new ArrayList<>();
-
-                        for (int i=0;i<cityScoreBase.size();i++) {
-                            String name = cityScoreBase.get(i).getName();
-                            int scoreValue = cityScoreBase.get(i).getScore();
-                            String color = cityScoreBase.get(i).getColor();
-                            for (int j=0;j<cityDataRepository.getCityDetailsData().size();j++) {
-                                if (cityDataRepository.getCityDetailsData().get(j).getCityDetailsName().equals(name)) {
-                                    newCityScore.add(new CityScore(name,scoreValue,color,cityDataRepository.getCityDetailsData().get(j)));
-                                }
-                            }
-                        }
-//                scoreRecViewAdapter.setCityScoresList(newCityScore);
-                        cityDataRepository.setCityScores(newCityScore);
-
-                    } // onResponse
-
-                }); //get city scores
-            } //onResponse
-
-        }); //get city details
-
-        System.out.println("Task 3 done");
-
-
-
-
-
-
-        cityScannerService.getScanResultsSalaries(cityName, new CityScannerService.VolleySalaryResponseListener() {
-
-            @Override
-            public void onError(String message) {
-
             }
 
             @Override
-            public void onResponse(ArrayList<CitySalaries> citySalaries) {
+            public void onError(VolleyError error) {
 
-//                citySalariesBase = citySalaries;
-//
-//                //-- populate jobSpinner
-//                String[] allJobTitles = new String[citySalariesBase.size()];
-//
-//                for (int i=0;i<citySalariesBase.size();i++) {
-//                    allJobTitles[i] = citySalariesBase.get(i).getTitle();
-//                }
-//
+            }
+        }); //get city details
+
+        cityScannerService.getScanResultsScores(cityName, new VolleyListeners.VolleyJSONResponseListener() {
+            @Override
+            public void onResponse(JSONObject jsonObject) {
+                double teleportCityScore = 0;
+                String summary = "";
+                JSONArray categories;
+                JSONObject scoresVerbose;
+                ArrayList<CityScore> scores = new ArrayList<>();
+
+                try {
+                    teleportCityScore = jsonObject.getDouble("teleport_city_score");
+                    summary = jsonObject.getString("summary");
+                    categories = jsonObject.getJSONArray("categories");
+                    for (int i=0;i<categories.length();i++) {
+                        scoresVerbose = categories.getJSONObject(i);
+                        scores.add(new CityScore(scoresVerbose.getString("name")
+                                ,scoresVerbose.getInt("score_out_of_10")
+                                ,scoresVerbose.getString("color")));
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+                String summaryResult = "Summary: " + summary;
+
+
+
+                String summaryString = String.valueOf(HtmlCompat.fromHtml(summaryResult,0));
+                cityDataRepository.setCitySummary(summaryString);
+
+                double roundedScore =  Math.round(teleportCityScore*100.0)/100.0;
+                String scoreString = "Teleport City Score: " + roundedScore;
+                cityDataRepository.setCityTeleportScore(scoreString);
+
+
+                if (cityDataRepository.getCityDetailsData().isEmpty()) {
+                    System.out.println("empty bruh");
+                } //check if sortCityDetails is empty
+
+
+                ArrayList<CityScore> newCityScore = new ArrayList<>();
+
+                for (int i=0;i<scores.size();i++) {
+                    String name = scores.get(i).getName();
+                    int scoreValue = scores.get(i).getScore();
+                    String color = scores.get(i).getColor();
+                    for (int j=0;j<cityDataRepository.getCityDetailsData().size();j++) {
+                        if (cityDataRepository.getCityDetailsData().get(j).getCityDetailsName().equals(name)) {
+                            newCityScore.add(new CityScore(name,scoreValue,color,cityDataRepository.getCityDetailsData().get(j)));
+                        }
+                    }
+                }
+
+                cityDataRepository.setCityScores(newCityScore);
+            }
+
+            @Override
+            public void onError(VolleyError error) {
+
+            }
+        });
+
+
+
+
+        cityScannerService.getScanResultsSalaries(cityName, new VolleyListeners.VolleyJSONResponseListener() {
+            @Override
+            public void onResponse(JSONObject jsonObject) {
+                JSONArray salaries;
+                JSONObject getSalaryDetails;
+                JSONObject job;
+                String title;
+                JSONObject salaryPercentiles;
+                double percentile_25;
+                double percentile_50;
+                double percentile_75;
+                ArrayList<CitySalaries> salaryData = new ArrayList<>();
+
+                try {
+                    salaries = jsonObject.getJSONArray("salaries");
+                    for (int i=0;i<salaries.length();i++) {
+                        getSalaryDetails = salaries.getJSONObject(i);
+
+                        job = getSalaryDetails.getJSONObject("job");
+                        title = job.getString("title");
+
+                        salaryPercentiles = getSalaryDetails.getJSONObject("salary_percentiles");
+                        percentile_25 = salaryPercentiles.getDouble("percentile_25");
+                        percentile_50 = salaryPercentiles.getDouble("percentile_50");
+                        percentile_75 = salaryPercentiles.getDouble("percentile_75");
+
+                        salaryData.add(new CitySalaries(title,percentile_25,percentile_50,percentile_75));
+                    }
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+                //-- populate jobSpinner
+                String[] allJobTitles = new String[salaryData.size()];
+
+                for (int i=0;i<salaryData.size();i++) {
+                    allJobTitles[i] = salaryData.get(i).getTitle();
+                }
+
 //                ArrayAdapter<String> adapter = new ArrayAdapter<>(MainActivity.this, R.layout.custom_spinner_layout, allJobTitles);
 //                jobSpinner.setAdapter(adapter);
+            }
 
+            @Override
+            public void onError(VolleyError error) {
 
             }
         }); //get city salaries
 
-        System.out.println("Task 4 done");
 
     }
 

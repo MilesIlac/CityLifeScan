@@ -6,23 +6,24 @@ import android.content.Context;
 import androidx.core.text.HtmlCompat;
 
 import com.android.volley.VolleyError;
-import com.milesilac.citylifescan.model.CityDataRepository;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.List;
 
 
-public class CityScanResults implements CityContract.CityScanResults {
+public class CityScannerPresenter implements CityScannerContract.Presenter {
 
-    CityContract.CityDataRepository cityDataRepository = new CityDataRepository();
     CityScannerService cityScannerService;
+
+    CityScannerContract.View view;
 
     Context context;
 
-    public CityScanResults(Context context, CityScannerService cityScannerService) {
+    public CityScannerPresenter(Context context, CityScannerService cityScannerService) {
         this.context = context;
         this.cityScannerService = cityScannerService;
     }
@@ -54,6 +55,8 @@ public class CityScanResults implements CityContract.CityScanResults {
                 for (int i=0;i<names.size();i++) {
                     countryNames[i] = names.get(i);
                 }
+
+                view.populateCityNames(countryNames);
             }
 
             @Override
@@ -96,8 +99,7 @@ public class CityScanResults implements CityContract.CityScanResults {
                     System.out.println("Image stack trace out");
                 }
 
-                String[] imageData = {imageURL,photographer,source,site,license};
-                cityDataRepository.setImageData(imageData);
+                view.setImageData(imageURL,photographer,source,site,license);
             }
 
             @Override
@@ -128,7 +130,7 @@ public class CityScanResults implements CityContract.CityScanResults {
                         "Continent name: " + continent + "\n" +
                         "Current Mayor: " + currentMayor + "\n";
 
-                cityDataRepository.setBasicInfo(outputInfo);
+                view.setBasicInfo(outputInfo);
             }
 
             @Override
@@ -202,7 +204,7 @@ public class CityScanResults implements CityContract.CityScanResults {
                     System.out.println("Scores stack trace out");
                 }
 
-                cityDataRepository.setCityDetailsData(cityDetails);
+                view.setCityDetails(cityDetails, cityName);
             }
 
             @Override
@@ -211,67 +213,7 @@ public class CityScanResults implements CityContract.CityScanResults {
             }
         }); //get city details
 
-        cityScannerService.getScanResultsScores(cityName, new VolleyListeners.VolleyJSONResponseListener() {
-            @Override
-            public void onResponse(JSONObject jsonObject) {
-                double teleportCityScore = 0;
-                String summary = "";
-                JSONArray categories;
-                JSONObject scoresVerbose;
-                ArrayList<CityScore> scores = new ArrayList<>();
 
-                try {
-                    teleportCityScore = jsonObject.getDouble("teleport_city_score");
-                    summary = jsonObject.getString("summary");
-                    categories = jsonObject.getJSONArray("categories");
-                    for (int i=0;i<categories.length();i++) {
-                        scoresVerbose = categories.getJSONObject(i);
-                        scores.add(new CityScore(scoresVerbose.getString("name")
-                                ,scoresVerbose.getInt("score_out_of_10")
-                                ,scoresVerbose.getString("color")));
-                    }
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-
-                String summaryResult = "Summary: " + summary;
-
-
-
-                String summaryString = String.valueOf(HtmlCompat.fromHtml(summaryResult,0));
-                cityDataRepository.setCitySummary(summaryString);
-
-                double roundedScore =  Math.round(teleportCityScore*100.0)/100.0;
-                String scoreString = "Teleport City Score: " + roundedScore;
-                cityDataRepository.setCityTeleportScore(scoreString);
-
-
-                if (cityDataRepository.getCityDetailsData().isEmpty()) {
-                    System.out.println("empty bruh");
-                } //check if sortCityDetails is empty
-
-
-                ArrayList<CityScore> newCityScore = new ArrayList<>();
-
-                for (int i=0;i<scores.size();i++) {
-                    String name = scores.get(i).getName();
-                    int scoreValue = scores.get(i).getScore();
-                    String color = scores.get(i).getColor();
-                    for (int j=0;j<cityDataRepository.getCityDetailsData().size();j++) {
-                        if (cityDataRepository.getCityDetailsData().get(j).getCityDetailsName().equals(name)) {
-                            newCityScore.add(new CityScore(name,scoreValue,color,cityDataRepository.getCityDetailsData().get(j)));
-                        }
-                    }
-                }
-
-                cityDataRepository.setCityScores(newCityScore);
-            }
-
-            @Override
-            public void onError(VolleyError error) {
-
-            }
-        });
 
 
 
@@ -329,36 +271,60 @@ public class CityScanResults implements CityContract.CityScanResults {
 
     }
 
-    @Override
-    public String[] readImageDataArray() { return cityDataRepository.getImageData(); }
+    public void getScanResultsScores(List<CityDetails> cityDetails, String cityName) {
+        cityScannerService.getScanResultsScores(cityName, new VolleyListeners.VolleyJSONResponseListener() {
+            @Override
+            public void onResponse(JSONObject jsonObject) {
+                double teleportCityScore = 0;
+                String summary = "";
+                JSONArray categories;
+                JSONObject scoresVerbose;
+                ArrayList<CityScore> scores = new ArrayList<>();
 
-    @Override
-    public String readImgUrl() { return cityDataRepository.getImageData()[0]; }
+                try {
+                    teleportCityScore = jsonObject.getDouble("teleport_city_score");
+                    summary = jsonObject.getString("summary");
+                    categories = jsonObject.getJSONArray("categories");
+                    for (int i=0;i<categories.length();i++) {
+                        scoresVerbose = categories.getJSONObject(i);
+                        scores.add(new CityScore(scoresVerbose.getString("name")
+                                ,scoresVerbose.getInt("score_out_of_10")
+                                ,scoresVerbose.getString("color")));
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
 
-    @Override
-    public String readPhotographer() { return cityDataRepository.getImageData()[1]; }
+                String summaryResult = "Summary: " + summary;
+                String summaryString = String.valueOf(HtmlCompat.fromHtml(summaryResult,0));
 
-    @Override
-    public String readSource() { return cityDataRepository.getImageData()[2]; }
+                double roundedScore =  Math.round(teleportCityScore*100.0)/100.0;
+                String scoreString = "Teleport City Score: " + roundedScore;
 
-    @Override
-    public String readSite() { return cityDataRepository.getImageData()[3]; }
-
-    @Override
-    public String readLicense() { return cityDataRepository.getImageData()[4]; }
+                view.setCitySummaryAndTeleportScore(summaryString, scoreString);
 
 
-    @Override
-    public String readBasicInfo() { return cityDataRepository.getBasicInfo(); }
+                ArrayList<CityScore> newCityScore = new ArrayList<>();
 
-    @Override
-    public String readSummary() { return cityDataRepository.getSummary(); }
+                for (int i=0;i<scores.size();i++) {
+                    String name = scores.get(i).getName();
+                    int scoreValue = scores.get(i).getScore();
+                    String color = scores.get(i).getColor();
+                    for (int j=0;j<cityDetails.size();j++) {
+                        if (cityDetails.get(j).getCityDetailsName().equals(name)) {
+                            newCityScore.add(new CityScore(name,scoreValue,color,cityDetails.get(j)));
+                        }
+                    }
+                }
 
-    @Override
-    public String readTeleportCityScore() { return cityDataRepository.getTeleportScore(); }
+                view.setCityScores(newCityScore);
+            }
 
-    @Override
-    public ArrayList<CityScore> readCityScores() { return cityDataRepository.getCityScores(); }
+            @Override
+            public void onError(VolleyError error) {
 
+            }
+        });
+    }
 
 }

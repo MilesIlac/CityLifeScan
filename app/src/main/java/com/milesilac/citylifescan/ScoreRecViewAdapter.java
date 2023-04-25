@@ -18,11 +18,12 @@ import androidx.recyclerview.widget.RecyclerView;
 
 
 import java.util.ArrayList;
+import java.util.List;
 
 
 public class ScoreRecViewAdapter extends RecyclerView.Adapter<ScoreRecViewAdapter.ViewHolder> {
 
-    ArrayList<CityScore> cityScoresList = new ArrayList<>();
+    List<CityScore> cityScoresList = new ArrayList<>();
     Context context;
 
     public ScoreRecViewAdapter(Context context) {
@@ -113,7 +114,7 @@ public class ScoreRecViewAdapter extends RecyclerView.Adapter<ScoreRecViewAdapte
     }
 
 
-    public void setCityScoresList(ArrayList<CityScore> cityScoresList) {
+    public void setCityScoresList(List<CityScore> cityScoresList) {
         this.cityScoresList = cityScoresList;
         notifyDataSetChanged();
     }

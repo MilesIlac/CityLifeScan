@@ -1,4 +1,4 @@
-package com.milesilac.citylifescan.view;
+package com.milesilac.citylifescan.view.cityscanner;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -24,14 +24,10 @@ import com.anychart.charts.Pyramid;
 
 import com.milesilac.citylifescan.model.CityDetails;
 import com.milesilac.citylifescan.model.CitySalaries;
-import com.milesilac.citylifescan.CityScannerContract;
-import com.milesilac.citylifescan.CityScannerPresenter;
 import com.milesilac.citylifescan.CityScannerService;
 import com.milesilac.citylifescan.model.CityScore;
-import com.milesilac.citylifescan.CustomDataEntry;
 import com.milesilac.citylifescan.MySingleton;
 import com.milesilac.citylifescan.R;
-import com.milesilac.citylifescan.ScoreRecViewAdapter;
 import com.milesilac.citylifescan.databinding.ActivityMainBinding;
 
 import java.util.ArrayList;

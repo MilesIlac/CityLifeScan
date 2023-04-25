@@ -1,4 +1,4 @@
-package com.milesilac.citylifescan;
+package com.milesilac.citylifescan.view.cityscanner;
 import com.anychart.chart.common.dataentry.DataEntry;
 
 public class CustomDataEntry extends DataEntry {

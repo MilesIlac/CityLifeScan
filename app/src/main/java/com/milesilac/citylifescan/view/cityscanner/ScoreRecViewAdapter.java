@@ -1,4 +1,4 @@
-package com.milesilac.citylifescan;
+package com.milesilac.citylifescan.view.cityscanner;
 
 import android.content.Context;
 import android.content.res.ColorStateList;
@@ -17,6 +17,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 
+import com.milesilac.citylifescan.R;
 import com.milesilac.citylifescan.model.CityDetailsData;
 import com.milesilac.citylifescan.model.CityScore;
 

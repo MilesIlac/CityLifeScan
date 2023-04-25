@@ -1,4 +1,4 @@
-package com.milesilac.citylifescan;
+package com.milesilac.citylifescan.view.cityscanner;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -9,6 +9,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.milesilac.citylifescan.R;
 import com.milesilac.citylifescan.model.CityDetailsData;
 
 import java.util.ArrayList;

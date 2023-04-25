@@ -1,9 +1,11 @@
-package com.milesilac.citylifescan;
+package com.milesilac.citylifescan.view.cityscanner;
 
 
 import androidx.core.text.HtmlCompat;
 
 import com.android.volley.VolleyError;
+import com.milesilac.citylifescan.CityScannerService;
+import com.milesilac.citylifescan.VolleyListeners;
 import com.milesilac.citylifescan.model.CityDetails;
 import com.milesilac.citylifescan.model.CityDetailsData;
 import com.milesilac.citylifescan.model.CitySalaries;

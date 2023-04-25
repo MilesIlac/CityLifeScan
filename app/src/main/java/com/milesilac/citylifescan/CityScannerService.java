@@ -5,7 +5,7 @@ import android.content.Context;
 import com.android.volley.Request;
 import com.android.volley.toolbox.JsonObjectRequest;
 
-public class CityScannerService implements VolleyListeners {
+public class CityScannerService {
 
     public static final String QUERY_FOR_CITY_NAME = "https://api.teleport.org/api/urban_areas/slug:";
     public static final String QUERY_FOR_ALL_URBAN_AREAS = "https://api.teleport.org/api/urban_areas/";
@@ -36,36 +36,36 @@ public class CityScannerService implements VolleyListeners {
     }
 
     //city name checker (autocomplete)
-    public void checkCityName(VolleyJSONResponseListener listener) {
+    public void checkCityName(VolleyListeners.VolleyJSONResponseListener listener) {
         setRequest(QUERY_FOR_ALL_URBAN_AREAS, listener);
     }
 
-    public void getScanResultsImage(String cityName, VolleyJSONResponseListener listener) {
+    public void getScanResultsImage(String cityName, VolleyListeners.VolleyJSONResponseListener listener) {
         String url = QUERY_FOR_CITY_NAME + formatCityName(cityName) + QUERY_FOR_CITY_IMAGE;
         setRequest(url, listener);
     }
 
-    public void getScanResultsBasicInfo(String cityName, VolleyJSONResponseListener listener) {
+    public void getScanResultsBasicInfo(String cityName, VolleyListeners.VolleyJSONResponseListener listener) {
         String url = QUERY_FOR_CITY_NAME + formatCityName(cityName) + "/";
         setRequest(url, listener);
     }
 
-    public void getScanResultsScores(String cityName, VolleyJSONResponseListener listener)  {
+    public void getScanResultsScores(String cityName, VolleyListeners.VolleyJSONResponseListener listener)  {
         String url = QUERY_FOR_CITY_NAME + formatCityName(cityName) + QUERY_FOR_CITY_SCORES;
         setRequest(url, listener);
     }
 
-    public void getScanResultsSalaries(String cityName, VolleyJSONResponseListener listener) {
+    public void getScanResultsSalaries(String cityName, VolleyListeners.VolleyJSONResponseListener listener) {
         String url = QUERY_FOR_CITY_NAME + formatCityName(cityName) + QUERY_FOR_CITY_SALARIES;
         setRequest(url, listener);
     }
 
-    public void getScanResultsCityDetails(String cityName, VolleyJSONResponseListener listener) {
+    public void getScanResultsCityDetails(String cityName, VolleyListeners.VolleyJSONResponseListener listener) {
         String url = QUERY_FOR_CITY_NAME + formatCityName(cityName) + QUERY_FOR_CITY_DETAILS;
         setRequest(url, listener);
     }
 
-    private void setRequest(String url, VolleyJSONResponseListener listener) {
+    private void setRequest(String url, VolleyListeners.VolleyJSONResponseListener listener) {
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url, null , listener::onResponse, listener::onError);
         MySingleton.getInstance(context).addToRequestQueue(jsonObjectRequest);
     }

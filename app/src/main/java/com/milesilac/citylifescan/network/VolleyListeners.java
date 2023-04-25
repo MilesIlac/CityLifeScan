@@ -1,4 +1,4 @@
-package com.milesilac.citylifescan;
+package com.milesilac.citylifescan.network;
 
 
 import com.android.volley.VolleyError;

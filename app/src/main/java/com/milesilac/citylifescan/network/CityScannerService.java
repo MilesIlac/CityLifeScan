@@ -1,4 +1,4 @@
-package com.milesilac.citylifescan;
+package com.milesilac.citylifescan.network;
 
 import android.content.Context;
 
@@ -67,7 +67,7 @@ public class CityScannerService {
 
     private void setRequest(String url, VolleyListeners.VolleyJSONResponseListener listener) {
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url, null , listener::onResponse, listener::onError);
-        MySingleton.getInstance(context).addToRequestQueue(jsonObjectRequest);
+        VolleySingleton.getInstance(context).addToRequestQueue(jsonObjectRequest);
     }
 
 }

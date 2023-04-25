@@ -1,4 +1,4 @@
-package com.milesilac.citylifescan;
+package com.milesilac.citylifescan.network;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -9,13 +9,13 @@ import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.Volley;
 
-public class MySingleton {
-    private static MySingleton instance;
+public class VolleySingleton {
+    private static VolleySingleton instance;
     private RequestQueue requestQueue;
     private ImageLoader imageLoader;
     private static Context ctx;
 
-    private MySingleton(Context context) {
+    private VolleySingleton(Context context) {
         ctx = context;
         requestQueue = getRequestQueue();
 
@@ -37,9 +37,9 @@ public class MySingleton {
 
     }
 
-    public static synchronized MySingleton getInstance(Context context) {
+    public static synchronized VolleySingleton getInstance(Context context) {
         if (instance == null) {
-            instance = new MySingleton(context);
+            instance = new VolleySingleton(context);
         }
         return instance;
     }

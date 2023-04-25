@@ -24,9 +24,9 @@ import com.anychart.charts.Pyramid;
 
 import com.milesilac.citylifescan.model.CityDetails;
 import com.milesilac.citylifescan.model.CitySalaries;
-import com.milesilac.citylifescan.CityScannerService;
+import com.milesilac.citylifescan.network.CityScannerService;
 import com.milesilac.citylifescan.model.CityScore;
-import com.milesilac.citylifescan.MySingleton;
+import com.milesilac.citylifescan.network.VolleySingleton;
 import com.milesilac.citylifescan.R;
 import com.milesilac.citylifescan.databinding.ActivityMainBinding;
 
@@ -127,8 +127,8 @@ public class MainActivity extends AppCompatActivity implements CityScannerContra
 
     @Override
     public void setImageData(String imageUrl, String photographer, String source, String site, String license) {
-        binding.photo.setImageUrl(imageUrl, MySingleton.getInstance(MainActivity.this).getImageLoader());
-        networkImageViewZoomed.setImageUrl(imageUrl, MySingleton.getInstance(MainActivity.this).getImageLoader());
+        binding.photo.setImageUrl(imageUrl, VolleySingleton.getInstance(MainActivity.this).getImageLoader());
+        networkImageViewZoomed.setImageUrl(imageUrl, VolleySingleton.getInstance(MainActivity.this).getImageLoader());
 
         String personAndSite = photographer + "@" + site;
         SpannableString string = new SpannableString(personAndSite);

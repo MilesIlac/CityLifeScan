@@ -24,7 +24,8 @@ public class CityScannerPresenter implements CityScannerContract.Presenter {
     CityScannerService cityScannerService;
     CityScannerContract.View view;
 
-    public CityScannerPresenter(CityScannerService cityScannerService) {
+    public CityScannerPresenter(CityScannerContract.View view, CityScannerService cityScannerService) {
+        this.view = view;
         this.cityScannerService = cityScannerService;
     }
 

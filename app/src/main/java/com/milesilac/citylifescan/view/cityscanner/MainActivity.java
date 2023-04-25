@@ -59,7 +59,7 @@ public class MainActivity extends AppCompatActivity implements CityScannerContra
         setContentView(binding.getRoot());
 
         CityScannerService cityScannerService = new CityScannerService(this);
-        presenter = new CityScannerPresenter(cityScannerService);
+        presenter = new CityScannerPresenter(this, cityScannerService);
 
         presenter.checkCityName();
 
@@ -183,7 +183,7 @@ public class MainActivity extends AppCompatActivity implements CityScannerContra
         binding.jobSpinner.setAdapter(adapter);
         setJobSpinnerListener(citySalaries);
 
-        isCitySalariesDataSet = false;
+        isCitySalariesDataSet = true;
         checkResponsesCompletion();
     }
 
@@ -237,10 +237,7 @@ public class MainActivity extends AppCompatActivity implements CityScannerContra
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if (count > 3) {
-                    presenter.getScanResults(binding.inputCity.getText().toString());
 
-                }
             }
 
             @Override

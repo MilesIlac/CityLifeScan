@@ -1,5 +1,9 @@
 package com.milesilac.citylifescan;
 
+import com.milesilac.citylifescan.model.CityDetails;
+import com.milesilac.citylifescan.model.CitySalaries;
+import com.milesilac.citylifescan.model.CityScore;
+
 import java.util.List;
 
 public interface CityScannerContract {

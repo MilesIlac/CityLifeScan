@@ -1,4 +1,4 @@
-package com.milesilac.citylifescan;
+package com.milesilac.citylifescan.model;
 
 import androidx.annotation.NonNull;
 
@@ -16,8 +16,6 @@ public class CitySalaries {
         this.percentile_75 = percentile_75;
     }
 
-    public CitySalaries() {
-    }
 
     @NonNull
     @Override

@@ -1,4 +1,4 @@
-package com.milesilac.citylifescan;
+package com.milesilac.citylifescan.model;
 
 
 public class CityScore {
@@ -20,10 +20,6 @@ public class CityScore {
         this.score = score;
         this.color = color;
         this.cityDetails = cityDetails;
-    }
-
-
-    public CityScore() {
     }
 
 

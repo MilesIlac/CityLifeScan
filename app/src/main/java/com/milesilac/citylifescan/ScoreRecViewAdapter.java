@@ -17,6 +17,9 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 
+import com.milesilac.citylifescan.model.CityDetailsData;
+import com.milesilac.citylifescan.model.CityScore;
+
 import java.util.ArrayList;
 import java.util.List;
 

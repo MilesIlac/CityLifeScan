@@ -4,6 +4,10 @@ package com.milesilac.citylifescan;
 import androidx.core.text.HtmlCompat;
 
 import com.android.volley.VolleyError;
+import com.milesilac.citylifescan.model.CityDetails;
+import com.milesilac.citylifescan.model.CityDetailsData;
+import com.milesilac.citylifescan.model.CitySalaries;
+import com.milesilac.citylifescan.model.CityScore;
 
 import org.json.JSONArray;
 import org.json.JSONException;

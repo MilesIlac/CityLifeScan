@@ -22,12 +22,12 @@ import com.anychart.AnyChart;
 import com.anychart.chart.common.dataentry.DataEntry;
 import com.anychart.charts.Pyramid;
 
-import com.milesilac.citylifescan.CityDetails;
-import com.milesilac.citylifescan.CitySalaries;
+import com.milesilac.citylifescan.model.CityDetails;
+import com.milesilac.citylifescan.model.CitySalaries;
 import com.milesilac.citylifescan.CityScannerContract;
 import com.milesilac.citylifescan.CityScannerPresenter;
 import com.milesilac.citylifescan.CityScannerService;
-import com.milesilac.citylifescan.CityScore;
+import com.milesilac.citylifescan.model.CityScore;
 import com.milesilac.citylifescan.CustomDataEntry;
 import com.milesilac.citylifescan.MySingleton;
 import com.milesilac.citylifescan.R;

@@ -1,4 +1,4 @@
-package com.milesilac.citylifescan;
+package com.milesilac.citylifescan.model;
 
 
 public class CityDetailsData {
@@ -9,7 +9,6 @@ public class CityDetailsData {
     String string_value;
     double decimal_value;
     int int_value;
-
 
     public CityDetailsData(String scoreName, String labelName, String type, String string_value) {
         this.scoreName = scoreName;
@@ -31,6 +30,7 @@ public class CityDetailsData {
         this.type = type;
         this.int_value = int_value;
     }
+
 
     public String getScoreName() {
         return scoreName;

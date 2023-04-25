@@ -45,17 +45,16 @@ public class MainActivity extends AppCompatActivity implements CityScannerContra
 
     public static final String SHOW_MEDIAN_SALARY = "MEDIAN SALARY: $";
 
-    ArrayList<CitySalaries> citySalariesBase = null;
-    Pyramid pyramid;
-
     private ActivityMainBinding binding;
     private ScoreRecViewAdapter scoreRecViewAdapter;
+    Pyramid pyramid;
 
-    private CityScannerPresenter presenter;
+    private CityScannerContract.Presenter presenter;
     private boolean isImageDataSet = false;
     private boolean isBasicInfoSet = false;
     private boolean isCitySummaryAndTeleportScoreSet = false;
     private boolean isCityScoresSet = false;
+    private boolean isCitySalariesDataSet = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,7 +63,7 @@ public class MainActivity extends AppCompatActivity implements CityScannerContra
         setContentView(binding.getRoot());
 
         CityScannerService cityScannerService = new CityScannerService(this);
-        presenter = new CityScannerPresenter(this, cityScannerService);
+        presenter = new CityScannerPresenter(cityScannerService);
 
         presenter.checkCityName();
 
@@ -83,16 +82,27 @@ public class MainActivity extends AppCompatActivity implements CityScannerContra
         imageAttribution = photoZoomed.findViewById(R.id.imageAttribution);
 
 
-        setScoresAdapter();
+        setupScoresAdapter();
+        setupPyramidChart();
         addEventListeners();
         emptyScreenInit();
 
     }
 
-    private void setScoresAdapter() {
+    private void setupScoresAdapter() {
         scoreRecViewAdapter = new ScoreRecViewAdapter(this);
         binding.scoresRecView.setAdapter(scoreRecViewAdapter);
         binding.scoresRecView.setLayoutManager(new LinearLayoutManager(this));
+    }
+
+    private void setupPyramidChart() {
+        pyramid = AnyChart.pyramid();
+
+        pyramid.legend(false);
+        pyramid.tooltip().titleFormat("{%percentile}th Percentile");
+        pyramid.tooltip().format("Estimated earnings: ${%salary}");
+
+        binding.pyramidChart.setChart(pyramid);
     }
 
     private void emptyScreenInit() {
@@ -103,10 +113,11 @@ public class MainActivity extends AppCompatActivity implements CityScannerContra
     }
 
     private void checkResponsesCompletion() {
-        if (isImageDataSet && isBasicInfoSet && isCitySummaryAndTeleportScoreSet && isCityScoresSet) {
+        if (isImageDataSet && isBasicInfoSet && isCitySummaryAndTeleportScoreSet && isCityScoresSet && isCitySalariesDataSet) {
             binding.imageCard.setVisibility(View.VISIBLE);
             binding.basicInfoCard.setVisibility(View.VISIBLE);
             binding.scoresCard.setVisibility(View.VISIBLE);
+            binding.pyramidChartCard.setVisibility(View.VISIBLE);
         }
 
     }
@@ -164,6 +175,56 @@ public class MainActivity extends AppCompatActivity implements CityScannerContra
         checkResponsesCompletion();
     }
 
+    @Override
+    public void setCitySalariesData(List<CitySalaries> citySalaries) {
+        String[] allJobTitles = new String[citySalaries.size()];
+
+        for (int i=0;i<citySalaries.size();i++) {
+            allJobTitles[i] = citySalaries.get(i).getTitle();
+        }
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(MainActivity.this, R.layout.custom_spinner_layout, allJobTitles);
+        binding.jobSpinner.setAdapter(adapter);
+        setJobSpinnerListener(citySalaries);
+
+        isCitySalariesDataSet = false;
+        checkResponsesCompletion();
+    }
+
+    private void setJobSpinnerListener(List<CitySalaries> citySalaries) {
+        binding.jobSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                //round off values to 2 decimal places
+                double percentile25th = citySalaries.get(position).getPercentile_25();
+                double percentile50th = citySalaries.get(position).getPercentile_50();
+                double percentile75th = citySalaries.get(position).getPercentile_75();
+                double percentile25thRoundOff = Math.round(percentile25th*100.0)/100.0;
+                double percentile50thRoundOff = Math.round(percentile50th*100.0)/100.0;
+                double percentile75thRoundOff = Math.round(percentile75th*100.0)/100.0;
+
+
+                String showMedianSalaryString = SHOW_MEDIAN_SALARY + percentile50thRoundOff;
+                binding.showMedianSalary.setText(showMedianSalaryString);
+
+
+                //--set salary percentiles to pyramid chart
+                List<DataEntry> data = new ArrayList<>();
+
+                data.add( new CustomDataEntry("What about 75% are making: $" + percentile25thRoundOff,75,25, percentile25thRoundOff));
+                data.add( new CustomDataEntry("What about 50% are making: $" + percentile50thRoundOff,50,50, percentile50thRoundOff));
+                data.add( new CustomDataEntry("What about 25% are making: $" + percentile75thRoundOff,25,75, percentile75thRoundOff));
+
+                pyramid.data(data);
+                //--
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+    }
 
     private void addEventListeners() {
         searchTextChangeListener();
@@ -181,7 +242,6 @@ public class MainActivity extends AppCompatActivity implements CityScannerContra
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 if (count > 3) {
-                    System.out.println("ontextchanged is called");
                     presenter.getScanResults(binding.inputCity.getText().toString());
 
                 }
@@ -202,81 +262,10 @@ public class MainActivity extends AppCompatActivity implements CityScannerContra
             isBasicInfoSet = false;
             isCitySummaryAndTeleportScoreSet = false;
             isCityScoresSet = false;
+            isCitySalariesDataSet = false;
 
             presenter.getScanResults(binding.inputCity.getText().toString());
         });
     }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-
-        pyramid = AnyChart.pyramid();
-
-        pyramid.legend(false);
-        pyramid.tooltip().titleFormat("{%percentile}th Percentile");
-        pyramid.tooltip().format("Estimated earnings: ${%salary}");
-        pyramid.enabled(false);
-
-        binding.pyramidChart.setChart(pyramid);
-
-        if (citySalariesBase != null) {
-            pyramid.enabled(true);
-
-            String[] allJobTitles = new String[citySalariesBase.size()];
-
-            for (int i=0;i<citySalariesBase.size();i++) {
-                allJobTitles[i] = citySalariesBase.get(i).getTitle();
-            }
-
-            ArrayAdapter<String> adapter = new ArrayAdapter<>(MainActivity.this, R.layout.custom_spinner_layout, allJobTitles);
-            binding.jobSpinner.setAdapter(adapter);
-            //--
-
-            //-- show Median Salary & Pyramid Chart
-//            Pyramid pyramid = AnyChart.pyramid();
-//            pyramid.legend(false);
-//            pyramid.tooltip().titleFormat("{%percentile}th Percentile");
-//            pyramid.tooltip().format("Estimated earnings: ${%salary}");
-//
-//            binding.pyramidChart.setChart(pyramid);
-
-            binding.jobSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                @Override
-                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                    //round off values to 2 decimal places
-                    double percentile25th = citySalariesBase.get(position).getPercentile_25();
-                    double percentile50th = citySalariesBase.get(position).getPercentile_50();
-                    double percentile75th = citySalariesBase.get(position).getPercentile_75();
-                    double percentile25thRoundOff = Math.round(percentile25th*100.0)/100.0;
-                    double percentile50thRoundOff = Math.round(percentile50th*100.0)/100.0;
-                    double percentile75thRoundOff = Math.round(percentile75th*100.0)/100.0;
-
-                    //-- show Median Salary for each job
-                    String showMedianSalaryString = SHOW_MEDIAN_SALARY + percentile50thRoundOff;
-                    binding.showMedianSalary.setText(showMedianSalaryString);
-                    //--
-
-                    //--set salary percentiles to pyramid chart
-
-                    List<DataEntry> data = new ArrayList<>();
-
-                    data.add( new CustomDataEntry("What about 75% are making: $" + percentile25thRoundOff,75,25, percentile25thRoundOff));
-                    data.add( new CustomDataEntry("What about 50% are making: $" + percentile50thRoundOff,50,50, percentile50thRoundOff));
-                    data.add( new CustomDataEntry("What about 25% are making: $" + percentile75thRoundOff,25,75, percentile75thRoundOff));
-
-                    pyramid.data(data);
-
-                    //--
-                }
-
-                @Override
-                public void onNothingSelected(AdapterView<?> parent) {
-
-                }
-            });
-        }
-    } //onResume
-
 
 }

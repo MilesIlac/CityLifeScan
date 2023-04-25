@@ -11,9 +11,12 @@ public interface CityScannerContract {
         void setCityDetails(List<CityDetails> cityDetails, String cityName);
         void setCitySummaryAndTeleportScore(String summary, String teleportScore);
         void setCityScores(List<CityScore> cityScores);
+        void setCitySalariesData(List<CitySalaries> citySalaries);
     }
 
     interface Presenter {
-
+        void checkCityName();
+        void getScanResults(String cityName);
+        void getScanResultsScores(List<CityDetails> cityDetails, String cityName);
     }
 }

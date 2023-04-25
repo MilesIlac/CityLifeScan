@@ -1,8 +1,6 @@
 package com.milesilac.citylifescan;
 
 
-import android.content.Context;
-
 import androidx.core.text.HtmlCompat;
 
 import com.android.volley.VolleyError;
@@ -18,16 +16,13 @@ import java.util.List;
 public class CityScannerPresenter implements CityScannerContract.Presenter {
 
     CityScannerService cityScannerService;
-
     CityScannerContract.View view;
 
-    Context context;
-
-    public CityScannerPresenter(Context context, CityScannerService cityScannerService) {
-        this.context = context;
+    public CityScannerPresenter(CityScannerService cityScannerService) {
         this.cityScannerService = cityScannerService;
     }
 
+    @Override
     public void checkCityName() {
         cityScannerService.checkCityName(new VolleyListeners.VolleyJSONResponseListener() {
             @Override
@@ -36,7 +31,6 @@ public class CityScannerPresenter implements CityScannerContract.Presenter {
                 JSONArray urbanAreas;
                 JSONObject getName;
                 ArrayList<String> names = new ArrayList<>();
-
 
                 try {
                     links = jsonObject.getJSONObject("_links");
@@ -47,9 +41,7 @@ public class CityScannerPresenter implements CityScannerContract.Presenter {
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
-                    System.out.println("City name stack trace out");
                 }
-
 
                 String[] countryNames = new String[names.size()];
                 for (int i=0;i<names.size();i++) {
@@ -66,10 +58,10 @@ public class CityScannerPresenter implements CityScannerContract.Presenter {
         });
     }
 
+    @Override
     public void getScanResults(String cityName) {
 
         cityScannerService.getScanResultsImage(cityName, new VolleyListeners.VolleyJSONResponseListener() {
-
             @Override
             public void onResponse(JSONObject jsonObject) {
                 JSONArray photos;
@@ -96,7 +88,6 @@ public class CityScannerPresenter implements CityScannerContract.Presenter {
 
                 } catch (JSONException e) {
                     e.printStackTrace();
-                    System.out.println("Image stack trace out");
                 }
 
                 view.setImageData(imageURL,photographer,source,site,license);
@@ -110,7 +101,6 @@ public class CityScannerPresenter implements CityScannerContract.Presenter {
         });
 
         cityScannerService.getScanResultsBasicInfo(cityName, new VolleyListeners.VolleyJSONResponseListener() {
-
             @Override
             public void onResponse(JSONObject jsonObject) {
                 String fullName = "";
@@ -123,7 +113,6 @@ public class CityScannerPresenter implements CityScannerContract.Presenter {
                     currentMayor = jsonObject.getString("mayor");
                 } catch (JSONException e) {
                     e.printStackTrace();
-                    System.out.println("Basic Info stack trace out");
                 }
 
                 String outputInfo = "Full name: " + fullName + "\n" +
@@ -140,7 +129,6 @@ public class CityScannerPresenter implements CityScannerContract.Presenter {
 
         });
 
-
         cityScannerService.getScanResultsCityDetails(cityName, new VolleyListeners.VolleyJSONResponseListener() {
             @Override
             public void onResponse(JSONObject jsonObject) {
@@ -154,7 +142,6 @@ public class CityScannerPresenter implements CityScannerContract.Presenter {
                 double dataObjectDecimal;
                 String dataObjectString;
                 int dataObjectInt;
-
 
                 ArrayList<CityDetails> cityDetails = new ArrayList<>();
                 ArrayList<CityDetailsData> cityDetailsData = new ArrayList<>();
@@ -199,9 +186,9 @@ public class CityScannerPresenter implements CityScannerContract.Presenter {
                         }
                         cityDetails.add(new CityDetails(scoreDetailLabel,cityDetailsData)); //no output
                     }
+
                 } catch (JSONException e) {
                     e.printStackTrace();
-                    System.out.println("Scores stack trace out");
                 }
 
                 view.setCityDetails(cityDetails, cityName);
@@ -211,12 +198,7 @@ public class CityScannerPresenter implements CityScannerContract.Presenter {
             public void onError(VolleyError error) {
 
             }
-        }); //get city details
-
-
-
-
-
+        });
 
         cityScannerService.getScanResultsSalaries(cityName, new VolleyListeners.VolleyJSONResponseListener() {
             @Override
@@ -251,26 +233,18 @@ public class CityScannerPresenter implements CityScannerContract.Presenter {
                     e.printStackTrace();
                 }
 
-                //-- populate jobSpinner
-                String[] allJobTitles = new String[salaryData.size()];
-
-                for (int i=0;i<salaryData.size();i++) {
-                    allJobTitles[i] = salaryData.get(i).getTitle();
-                }
-
-//                ArrayAdapter<String> adapter = new ArrayAdapter<>(MainActivity.this, R.layout.custom_spinner_layout, allJobTitles);
-//                jobSpinner.setAdapter(adapter);
+                view.setCitySalariesData(salaryData);
             }
 
             @Override
             public void onError(VolleyError error) {
 
             }
-        }); //get city salaries
-
+        });
 
     }
 
+    @Override
     public void getScanResultsScores(List<CityDetails> cityDetails, String cityName) {
         cityScannerService.getScanResultsScores(cityName, new VolleyListeners.VolleyJSONResponseListener() {
             @Override

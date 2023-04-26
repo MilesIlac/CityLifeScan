@@ -18,6 +18,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 
 import com.milesilac.citylifescan.R;
+import com.milesilac.citylifescan.model.CityDetails;
 import com.milesilac.citylifescan.model.CityDetailsData;
 import com.milesilac.citylifescan.model.CityScore;
 
@@ -59,35 +60,37 @@ public class ScoreRecViewAdapter extends RecyclerView.Adapter<ScoreRecViewAdapte
         //--
 
         //-- get details list
-        if (cityScoresList.get(position).getCityDetails().getCityDetailsName().equals(cityScoresList.get(position).getName())) {
-            ArrayList<CityDetailsData> getEachCityDetailsData = new ArrayList<>(); //filters ArrayList<CityDetailsData>
-            for (int i=0;i<cityScoresList.get(position).getCityDetails().getCityDetailsData().size();i++) {
-                String scoreName = cityScoresList.get(position).getCityDetails().getCityDetailsData().get(i).getScoreName();
+        CityDetails cityDetails = cityScoresList.get(position).getCityDetails();
+        if (cityDetails.getCityDetailsName().equals(cityScoresList.get(position).getName())) {
+            ArrayList<CityDetailsData> getEachCityDetailsData = new ArrayList<>();
+            for (int i = 0, size = cityDetails.getCityDetailsData().size() ; i < size ; i++) {
+                CityDetailsData cityDetailsData = cityDetails.getCityDetailsData().get(i);
+                String scoreName = cityDetailsData.getScoreName();
                 if (scoreName.equals(cityScoresList.get(position).getName())) {
-                    String name = cityScoresList.get(position).getCityDetails().getCityDetailsData().get(i).getLabelName();
-                    String type = cityScoresList.get(position).getCityDetails().getCityDetailsData().get(i).getType();
+                    String name = cityDetailsData.getLabelName();
+                    String type = cityDetailsData.getType();
                     if (type.equals("float")) {
-                        double decimal_value = cityScoresList.get(position).getCityDetails().getCityDetailsData().get(i).getDecimal_value();
+                        double decimal_value = cityDetailsData.getDecimal_value();
                         getEachCityDetailsData.add(new CityDetailsData(scoreName,name,type,decimal_value));
                     }
                     if (type.equals("percent")) {
-                        double decimal_value = cityScoresList.get(position).getCityDetails().getCityDetailsData().get(i).getDecimal_value();
+                        double decimal_value = cityDetailsData.getDecimal_value();
                         getEachCityDetailsData.add(new CityDetailsData(scoreName,name,type,decimal_value));
                     }
                     if (type.equals("currency_dollar")) {
-                        double decimal_value = cityScoresList.get(position).getCityDetails().getCityDetailsData().get(i).getDecimal_value();
+                        double decimal_value = cityDetailsData.getDecimal_value();
                         getEachCityDetailsData.add(new CityDetailsData(scoreName,name,type,decimal_value));
                     }
                     if (type.equals("string")) {
-                        String string_value = cityScoresList.get(position).getCityDetails().getCityDetailsData().get(i).getString_value();
+                        String string_value = cityDetailsData.getString_value();
                         getEachCityDetailsData.add(new CityDetailsData(scoreName,name,type,string_value));
                     }
                     if (type.equals("url")) {
-                        String string_value = cityScoresList.get(position).getCityDetails().getCityDetailsData().get(i).getString_value();
+                        String string_value = cityDetailsData.getString_value();
                         getEachCityDetailsData.add(new CityDetailsData(scoreName,name,type,string_value));
                     }
                     if (type.equals("int")) {
-                        int int_value = cityScoresList.get(position).getCityDetails().getCityDetailsData().get(i).getInt_value();
+                        int int_value = cityDetailsData.getInt_value();
                         getEachCityDetailsData.add(new CityDetailsData(scoreName,name,type,int_value));
                     }
                 }

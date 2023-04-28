@@ -32,7 +32,18 @@ public class EntityResponse extends BaseEntityResponse {
     public String teleportCityUrl;
 
     @SerializedName("ua_id")
-    public String ua_id;
+    public String uaId;
+
+    //for scores and details
+    public CategoriesEntity[] categories;
+
+    @SerializedName("summary")
+    public String cityScoreSummary;
+
+    @SerializedName("teleport_city_score")
+    public float teleportCityScore;
+
+
 
     @NonNull
     @Override

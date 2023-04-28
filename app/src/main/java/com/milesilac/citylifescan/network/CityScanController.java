@@ -103,4 +103,48 @@ public class CityScanController {
             }
         });
     }
+
+    public void getCityDetails(String cityName, RetrofitListeners.EntityResponseListener listener) {
+        Call<EntityResponse> call = cityScanService.getCityDetails(StringUtils.formatCityName(cityName));
+        call.enqueue(new Callback<EntityResponse>() {
+            @Override
+            public void onResponse(@NonNull Call<EntityResponse> call, @NonNull Response<EntityResponse> response) {
+                if (listener != null) {
+                    if (response.isSuccessful()) {
+                        EntityResponse body = response.body();
+                        if (body != null) {
+                            listener.onResponse(body);
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<EntityResponse> call, @NonNull Throwable t) {
+
+            }
+        });
+    }
+
+    public void getCityScores(String cityName, RetrofitListeners.EntityResponseListener listener) {
+        Call<EntityResponse> call = cityScanService.getCityScores(StringUtils.formatCityName(cityName));
+        call.enqueue(new Callback<EntityResponse>() {
+            @Override
+            public void onResponse(@NonNull Call<EntityResponse> call, @NonNull Response<EntityResponse> response) {
+                if (listener != null) {
+                    if (response.isSuccessful()) {
+                        EntityResponse body = response.body();
+                        if (body != null) {
+                            listener.onResponse(body);
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<EntityResponse> call, @NonNull Throwable t) {
+
+            }
+        });
+    }
 }

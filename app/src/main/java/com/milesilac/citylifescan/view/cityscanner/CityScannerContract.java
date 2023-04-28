@@ -22,6 +22,7 @@ public interface CityScannerContract {
         void checkCityName();
         void checkCityNameRetrofit();
         void getScanResults(String cityName);
+        void getScanResultsRetrofit(String cityName);
         void getScanResultsScores(List<CityDetails> cityDetails, String cityName);
     }
 }

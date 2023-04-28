@@ -6,29 +6,13 @@ public class CityDetailsData {
     String scoreName;
     String labelName;
     String type;
-    String string_value;
-    double decimal_value;
-    int int_value;
+    String value;
 
-    public CityDetailsData(String scoreName, String labelName, String type, String string_value) {
+    public CityDetailsData(String scoreName, String labelName, String type, String value) {
         this.scoreName = scoreName;
         this.labelName = labelName;
         this.type = type;
-        this.string_value = string_value;
-    }
-
-    public CityDetailsData(String scoreName, String labelName, String type, double decimal_value) {
-        this.scoreName = scoreName;
-        this.labelName = labelName;
-        this.type = type;
-        this.decimal_value = decimal_value;
-    }
-
-    public CityDetailsData(String scoreName, String labelName, String type, int int_value) {
-        this.scoreName = scoreName;
-        this.labelName = labelName;
-        this.type = type;
-        this.int_value = int_value;
+        this.value = value;
     }
 
 
@@ -56,27 +40,12 @@ public class CityDetailsData {
         this.type = type;
     }
 
-    public String getString_value() {
-        return string_value;
+    public String getValue() {
+        return value;
     }
 
-    public void setString_value(String string_value) {
-        this.string_value = string_value;
+    public void setValue(String value) {
+        this.value = value;
     }
 
-    public double getDecimal_value() {
-        return decimal_value;
-    }
-
-    public void setDecimal_value(double decimal_value) {
-        this.decimal_value = decimal_value;
-    }
-
-    public int getInt_value() {
-        return int_value;
-    }
-
-    public void setInt_value(int int_value) {
-        this.int_value = int_value;
-    }
 }

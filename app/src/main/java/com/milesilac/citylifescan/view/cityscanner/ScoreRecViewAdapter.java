@@ -69,30 +69,8 @@ public class ScoreRecViewAdapter extends RecyclerView.Adapter<ScoreRecViewAdapte
                 if (scoreName.equals(cityScoresList.get(position).getName())) {
                     String name = cityDetailsData.getLabelName();
                     String type = cityDetailsData.getType();
-                    if (type.equals("float")) {
-                        double decimal_value = cityDetailsData.getDecimal_value();
-                        getEachCityDetailsData.add(new CityDetailsData(scoreName,name,type,decimal_value));
-                    }
-                    if (type.equals("percent")) {
-                        double decimal_value = cityDetailsData.getDecimal_value();
-                        getEachCityDetailsData.add(new CityDetailsData(scoreName,name,type,decimal_value));
-                    }
-                    if (type.equals("currency_dollar")) {
-                        double decimal_value = cityDetailsData.getDecimal_value();
-                        getEachCityDetailsData.add(new CityDetailsData(scoreName,name,type,decimal_value));
-                    }
-                    if (type.equals("string")) {
-                        String string_value = cityDetailsData.getString_value();
-                        getEachCityDetailsData.add(new CityDetailsData(scoreName,name,type,string_value));
-                    }
-                    if (type.equals("url")) {
-                        String string_value = cityDetailsData.getString_value();
-                        getEachCityDetailsData.add(new CityDetailsData(scoreName,name,type,string_value));
-                    }
-                    if (type.equals("int")) {
-                        int int_value = cityDetailsData.getInt_value();
-                        getEachCityDetailsData.add(new CityDetailsData(scoreName,name,type,int_value));
-                    }
+                    String value = cityDetailsData.getValue();
+                    getEachCityDetailsData.add(new CityDetailsData(scoreName,name,type,value));
                 }
             }
             scoreDetailsRecViewAdapter.setCityDetailsDataList(getEachCityDetailsData);
@@ -103,6 +81,7 @@ public class ScoreRecViewAdapter extends RecyclerView.Adapter<ScoreRecViewAdapte
         holder.scoreDetailsTable.setVisibility(View.GONE);
         holder.scoreLayout.setOnClickListener(v -> {
             switch (holder.scoreDetailsTable.getVisibility()) {
+                case View.INVISIBLE:
                 case View.GONE:
                     holder.scoreDetailsTable.setVisibility(View.VISIBLE);
                     break;

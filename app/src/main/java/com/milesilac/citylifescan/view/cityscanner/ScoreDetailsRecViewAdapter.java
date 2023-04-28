@@ -36,27 +36,31 @@ public class ScoreDetailsRecViewAdapter extends RecyclerView.Adapter<ScoreDetail
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
 
         holder.scoreDetailName.setText((cityDetailsData.get(position).getLabelName()));
+        String value = cityDetailsData.get(position).getValue();
         if (cityDetailsData.get(position).getType().equals("float")) {
-            double getFloat = Math.round(cityDetailsData.get(position).getDecimal_value()*100.0)/100.0;
-            holder.scoreDetailValue.setText(String.valueOf(getFloat));
+            double getFloat = Double.parseDouble(value);
+            double formatFloat = Math.round(getFloat*100.0)/100.0;
+            holder.scoreDetailValue.setText(String.valueOf(formatFloat));
         }
         if (cityDetailsData.get(position).getType().equals("percent")) {
-            double getPercentage = Math.round(cityDetailsData.get(position).getDecimal_value()*100.0)/100.0;
-            String percent = getPercentage + "%";
+            double getPercentage = Double.parseDouble(value);
+            double formatPercentage = Math.round(getPercentage*100.0)/100.0;
+            String percent = formatPercentage + "%";
             holder.scoreDetailValue.setText(percent);
         }
         if (cityDetailsData.get(position).getType().equals("currency_dollar")) {
-            String price = "$" + cityDetailsData.get(position).getDecimal_value();
+            String price = "$" + value;
             holder.scoreDetailValue.setText(price);
         }
         if (cityDetailsData.get(position).getType().equals("int")) {
-            holder.scoreDetailValue.setText(String.valueOf(cityDetailsData.get(position).getInt_value()));
+            int getInt = (int) Double.parseDouble(value);
+            holder.scoreDetailValue.setText(String.valueOf(getInt));
         }
         if (cityDetailsData.get(position).getType().equals("string")) {
-            holder.scoreDetailValue.setText(cityDetailsData.get(position).getString_value());
+            holder.scoreDetailValue.setText(value);
         }
         if (cityDetailsData.get(position).getType().equals("url")) {
-            holder.scoreDetailValue.setText(cityDetailsData.get(position).getString_value());
+            holder.scoreDetailValue.setText(value);
         }
 
     } //onBindViewHolder

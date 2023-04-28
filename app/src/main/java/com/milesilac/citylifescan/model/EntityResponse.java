@@ -41,9 +41,10 @@ public class EntityResponse extends BaseEntityResponse {
     public String cityScoreSummary;
 
     @SerializedName("teleport_city_score")
-    public float teleportCityScore;
+    public double teleportCityScore;
 
-
+    //for salaries
+    public SalariesEntity[] salaries;
 
     @NonNull
     @Override

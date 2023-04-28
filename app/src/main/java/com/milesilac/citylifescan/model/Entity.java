@@ -38,6 +38,18 @@ public class Entity {
     public String label;
     public String type;
 
+    //salariesEntity
+    public String title;
+
+    @SerializedName("percentile_25")
+    public double percentile25;
+
+    @SerializedName("percentile_50")
+    public double percentile50;
+
+    @SerializedName("percentile_75")
+    public double percentile75;
+
     @SerializedName("mobile")
     public String imageUrl;
 }

@@ -24,7 +24,6 @@ import com.anychart.charts.Pyramid;
 
 import com.milesilac.citylifescan.model.CityDetails;
 import com.milesilac.citylifescan.model.CitySalaries;
-import com.milesilac.citylifescan.network.CityScannerService;
 import com.milesilac.citylifescan.model.CityScore;
 import com.milesilac.citylifescan.network.VolleySingleton;
 import com.milesilac.citylifescan.R;
@@ -58,10 +57,9 @@ public class MainActivity extends AppCompatActivity implements CityScannerContra
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        CityScannerService cityScannerService = new CityScannerService(this);
-        presenter = new CityScannerPresenter(this, cityScannerService);
+        presenter = new CityScannerPresenter(this);
 
-        presenter.checkCityNameRetrofit();
+        presenter.checkCityName();
 
         //set default networkImageView
         binding.photo.setDefaultImageResId(R.drawable.ic_launcher_foreground);
@@ -152,7 +150,7 @@ public class MainActivity extends AppCompatActivity implements CityScannerContra
     }
     @Override
     public void setCityDetails(List<CityDetails> cityDetails, String cityName) {
-        presenter.getScanResultsScoresRetrofit(cityDetails, cityName);
+        presenter.getScanResultsScores(cityDetails, cityName);
     }
 
     public void setCitySummaryAndTeleportScore(String summary, String teleportScore) {

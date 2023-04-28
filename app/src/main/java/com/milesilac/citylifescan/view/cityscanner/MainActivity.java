@@ -15,17 +15,19 @@ import android.view.View;
 import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.android.volley.toolbox.NetworkImageView;
 import com.anychart.AnyChart;
 import com.anychart.chart.common.dataentry.DataEntry;
 import com.anychart.charts.Pyramid;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.request.RequestOptions;
 import com.milesilac.citylifescan.model.CityDetails;
 import com.milesilac.citylifescan.model.CitySalaries;
 import com.milesilac.citylifescan.model.CityScore;
-import com.milesilac.citylifescan.network.VolleySingleton;
 import com.milesilac.citylifescan.R;
 import com.milesilac.citylifescan.databinding.ActivityMainBinding;
 
@@ -35,7 +37,7 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity implements CityScannerContract.View {
 
     TextView imagePhotographer, imageAttribution;
-    NetworkImageView networkImageViewZoomed;
+    ImageView networkImageViewZoomed;
     Dialog photoZoomed;
 
     public static final String SHOW_MEDIAN_SALARY = "MEDIAN SALARY: $";
@@ -61,9 +63,6 @@ public class MainActivity extends AppCompatActivity implements CityScannerContra
 
         presenter.checkCityName();
 
-        //set default networkImageView
-        binding.photo.setDefaultImageResId(R.drawable.ic_launcher_foreground);
-
         //setup networkImageView dialog
         photoZoomed = new Dialog(this);
         photoZoomed.requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -74,7 +73,6 @@ public class MainActivity extends AppCompatActivity implements CityScannerContra
         networkImageViewZoomed = photoZoomed.findViewById(R.id.photoZoomed);
         imagePhotographer = photoZoomed.findViewById(R.id.imagePhotographer);
         imageAttribution = photoZoomed.findViewById(R.id.imageAttribution);
-
 
         setupScoresAdapter();
         setupPyramidChart();
@@ -125,8 +123,19 @@ public class MainActivity extends AppCompatActivity implements CityScannerContra
 
     @Override
     public void setImageData(String imageUrl, String photographer, String source, String site, String license) {
-        binding.photo.setImageUrl(imageUrl, VolleySingleton.getInstance(MainActivity.this).getImageLoader());
-        networkImageViewZoomed.setImageUrl(imageUrl, VolleySingleton.getInstance(MainActivity.this).getImageLoader());
+        Glide.with(this)
+             .load(imageUrl)
+             .apply(new RequestOptions()
+                     .timeout(10000)
+                     .diskCacheStrategy(DiskCacheStrategy.ALL))
+             .into(binding.photo);
+
+        Glide.with(this)
+                .load(imageUrl)
+                .apply(new RequestOptions()
+                        .timeout(10000)
+                        .diskCacheStrategy(DiskCacheStrategy.ALL))
+                .into(networkImageViewZoomed);
 
         String personAndSite = photographer + "@" + site;
         SpannableString string = new SpannableString(personAndSite);

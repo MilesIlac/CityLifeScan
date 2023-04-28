@@ -40,13 +40,14 @@
                 app:strokeWidth="3dp"
                 android:background="#93761e">
 
-                <com.android.volley.toolbox.NetworkImageView
+                <ImageView
                     android:id="@+id/photo"
                     android:layout_width="wrap_content"
                     android:layout_height="250dp"
                     android:layout_gravity="center"
                     android:adjustViewBounds="true"
-                    android:scaleType="fitCenter" />
+                    android:scaleType="fitCenter"
+                    tools:ignore="ContentDescription" />
 
             </com.google.android.material.card.MaterialCardView>
 
@@ -74,7 +75,7 @@
                         android:id="@+id/outputTeleportCityScore"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:hint="Score Here"
+                        tools:text="Score Here"
                         android:layout_gravity="center"
                         android:textSize="20sp"
                         android:textColor="#b9b3aa"
@@ -85,7 +86,7 @@
                         android:id="@+id/outputBasicInfo"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:hint="Basic Info Here"
+                        tools:text="Basic Info Here"
                         android:textColor="#b9b3aa"
                         android:textColorHint="#b9b3aa"/>
 
@@ -93,7 +94,7 @@
                         android:id="@+id/outputSummary"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:hint="Summary Here"
+                        tools:text="Summary Here"
                         android:textColor="#b9b3aa"
                         android:textColorHint="#b9b3aa"/>
 
@@ -176,7 +177,7 @@
                             android:layout_gravity="center"
                             android:backgroundTint="#b9b3aa"
                             android:popupBackground="#181a1b"
-                            android:text="Accountant"
+                            tools:text="Accountant"
                             android:textColor="#b9b3aa" />
 
                     </LinearLayout>

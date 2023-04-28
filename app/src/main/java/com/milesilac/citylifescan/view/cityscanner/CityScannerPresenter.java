@@ -4,7 +4,11 @@ package com.milesilac.citylifescan.view.cityscanner;
 import androidx.core.text.HtmlCompat;
 
 import com.android.volley.VolleyError;
+import com.milesilac.citylifescan.model.Entity;
+import com.milesilac.citylifescan.model.EntityResponse;
+import com.milesilac.citylifescan.network.CityScanController;
 import com.milesilac.citylifescan.network.CityScannerService;
+import com.milesilac.citylifescan.network.RetrofitListeners;
 import com.milesilac.citylifescan.network.VolleyListeners;
 import com.milesilac.citylifescan.model.CityDetails;
 import com.milesilac.citylifescan.model.CityDetailsData;
@@ -23,6 +27,9 @@ public class CityScannerPresenter implements CityScannerContract.Presenter {
 
     CityScannerService cityScannerService;
     CityScannerContract.View view;
+
+
+    CityScanController controller = new CityScanController();
 
     public CityScannerPresenter(CityScannerContract.View view, CityScannerService cityScannerService) {
         this.view = view;
@@ -60,6 +67,30 @@ public class CityScannerPresenter implements CityScannerContract.Presenter {
 
             @Override
             public void onError(VolleyError error) {
+
+            }
+        });
+    }
+
+    @Override
+    public void checkCityNameRetrofit() {
+        controller.getAllUrbanAreas(new RetrofitListeners.AllUrbanAreasResponseListener() {
+            @Override
+            public void onResponse(Object data) {
+                EntityResponse entity = (EntityResponse) data;
+                ArrayList<String> names = new ArrayList<>();
+
+                Entity[] uaItems = entity._links.uaItem;
+                for (Entity uaItem : uaItems) {
+                    names.add(uaItem.name);
+                }
+
+                String[] countryNames = new String[names.size()];
+                for (int i=0;i<names.size();i++) {
+                    countryNames[i] = names.get(i);
+                }
+
+                view.populateCityNames(countryNames);
 
             }
         });

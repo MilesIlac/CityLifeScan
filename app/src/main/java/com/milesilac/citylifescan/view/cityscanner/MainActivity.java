@@ -61,7 +61,7 @@ public class MainActivity extends AppCompatActivity implements CityScannerContra
         CityScannerService cityScannerService = new CityScannerService(this);
         presenter = new CityScannerPresenter(this, cityScannerService);
 
-        presenter.checkCityName();
+        presenter.checkCityNameRetrofit();
 
         //set default networkImageView
         binding.photo.setDefaultImageResId(R.drawable.ic_launcher_foreground);

@@ -9,7 +9,6 @@ import com.milesilac.citylifescan.model.EntityResponse;
 import com.milesilac.citylifescan.model.PhotosEntity;
 import com.milesilac.citylifescan.network.CityScanController;
 import com.milesilac.citylifescan.network.CityScannerService;
-import com.milesilac.citylifescan.network.RetrofitListeners;
 import com.milesilac.citylifescan.network.VolleyListeners;
 import com.milesilac.citylifescan.model.CityDetails;
 import com.milesilac.citylifescan.model.CityDetailsData;
@@ -145,33 +144,46 @@ public class CityScannerPresenter implements CityScannerContract.Presenter {
             view.setImageData(imageUrl,photographer,source,site,license);
         });
 
-        cityScannerService.getScanResultsBasicInfo(cityName, new VolleyListeners.VolleyJSONResponseListener() {
-            @Override
-            public void onResponse(JSONObject jsonObject) {
-                String fullName = "";
-                String continent = "";
-                String currentMayor = "";
+//        cityScannerService.getScanResultsBasicInfo(cityName, new VolleyListeners.VolleyJSONResponseListener() {
+//            @Override
+//            public void onResponse(JSONObject jsonObject) {
+//                String fullName = "";
+//                String continent = "";
+//                String currentMayor = "";
+//
+//                try {
+//                    fullName = jsonObject.getString("full_name");
+//                    continent = jsonObject.getString("continent");
+//                    currentMayor = jsonObject.getString("mayor");
+//                } catch (JSONException e) {
+//                    e.printStackTrace();
+//                }
+//
+//                String outputInfo = "Full name: " + fullName + "\n" +
+//                        "Continent name: " + continent + "\n" +
+//                        "Current Mayor: " + currentMayor + "\n";
+//
+//                view.setBasicInfo(outputInfo);
+//            }
+//
+//            @Override
+//            public void onError(VolleyError error) {
+//
+//            }
+//
+//        });
 
-                try {
-                    fullName = jsonObject.getString("full_name");
-                    continent = jsonObject.getString("continent");
-                    currentMayor = jsonObject.getString("mayor");
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
+        controller.getCitySummary(cityName, data -> {
+            EntityResponse response = (EntityResponse) data;
+            String fullName = response.fullName;
+            String continent = response.continent;
+            String currentMayor = (response.mayor == null || response.mayor.isEmpty()) ? "No Data" : response.mayor;
 
-                String outputInfo = "Full name: " + fullName + "\n" +
-                        "Continent name: " + continent + "\n" +
-                        "Current Mayor: " + currentMayor + "\n";
+            String outputInfo = "Full name: " + fullName + "\n" +
+                    "Continent name: " + continent + "\n" +
+                    "Current Mayor: " + currentMayor + "\n";
 
-                view.setBasicInfo(outputInfo);
-            }
-
-            @Override
-            public void onError(VolleyError error) {
-
-            }
-
+            view.setBasicInfo(outputInfo);
         });
 
         cityScannerService.getScanResultsCityDetails(cityName, new VolleyListeners.VolleyJSONResponseListener() {
@@ -304,6 +316,19 @@ public class CityScannerPresenter implements CityScannerContract.Presenter {
             String imageUrl = photos[0].image.imageUrl;
 
             view.setImageData(imageUrl,photographer,source,site,license);
+        });
+
+        controller.getCitySummary(cityName, data -> {
+            EntityResponse response = (EntityResponse) data;
+            String fullName = response.fullName;
+            String continent = response.continent;
+            String currentMayor = (response.mayor == null || response.mayor.isEmpty()) ? "No Data" : response.mayor;
+
+            String outputInfo = "Full name: " + fullName + "\n" +
+                    "Continent name: " + continent + "\n" +
+                    "Current Mayor: " + currentMayor + "\n";
+
+            view.setBasicInfo(outputInfo);
         });
     }
 

@@ -8,5 +8,5 @@ public class LinksEntity extends BaseLinksEntity {
     public Entity[] uaItem;
 
     @SerializedName("ua:scores")
-    public Entity[] uaScores;
+    public Entity uaScores;
 }

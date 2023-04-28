@@ -14,4 +14,7 @@ public interface CityScanService {
 
     @GET("api/urban_areas/slug:{cityName}/images/")
     Call<EntityResponse> getCityImageDetails(@Path("cityName") String cityName);
+
+    @GET("api/urban_areas/slug:{cityName}/")
+    Call<EntityResponse> getCitySummary(@Path("cityName") String cityName);
 }

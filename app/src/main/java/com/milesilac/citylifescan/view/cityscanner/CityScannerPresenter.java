@@ -4,6 +4,7 @@ package com.milesilac.citylifescan.view.cityscanner;
 import androidx.core.text.HtmlCompat;
 
 import com.android.volley.VolleyError;
+import com.milesilac.citylifescan.model.CategoriesEntity;
 import com.milesilac.citylifescan.model.Entity;
 import com.milesilac.citylifescan.model.EntityResponse;
 import com.milesilac.citylifescan.model.PhotosEntity;
@@ -186,75 +187,123 @@ public class CityScannerPresenter implements CityScannerContract.Presenter {
             view.setBasicInfo(outputInfo);
         });
 
-        cityScannerService.getScanResultsCityDetails(cityName, new VolleyListeners.VolleyJSONResponseListener() {
-            @Override
-            public void onResponse(JSONObject jsonObject) {
-                JSONArray categories;
-                JSONObject forEachScore;
-                String scoreDetailLabel;
-                JSONArray data;
-                JSONObject forEachData;
-                String dataObjectName;
-                String dataObjectType;
-                double dataObjectDecimal;
-                String dataObjectString;
-                int dataObjectInt;
+//        cityScannerService.getScanResultsCityDetails(cityName, new VolleyListeners.VolleyJSONResponseListener() {
+//            @Override
+//            public void onResponse(JSONObject jsonObject) {
+//                JSONArray categories;
+//                JSONObject forEachScore;
+//                String scoreDetailLabel;
+//                JSONArray data;
+//                JSONObject forEachData;
+//                String dataObjectName;
+//                String dataObjectType;
+//                double dataObjectDecimal;
+//                String dataObjectString;
+//                int dataObjectInt;
+//
+//                ArrayList<CityDetails> cityDetails = new ArrayList<>();
+//                ArrayList<CityDetailsData> cityDetailsData = new ArrayList<>();
+//
+//                try {
+//                    categories = jsonObject.getJSONArray("categories");
+//                    for (int i=0;i<categories.length();i++) {
+//                        forEachScore = categories.getJSONObject(i); //get each score
+//                        scoreDetailLabel = forEachScore.getString("label"); //get each score name
+//
+//                        data = forEachScore.getJSONArray("data"); //get data array
+//                        for (int j=0;j<data.length();j++) { //scan through data array
+//                            forEachData = data.getJSONObject(j); //declare array element object
+//                            dataObjectName = forEachData.getString("label");
+//                            dataObjectType = forEachData.getString("type");
+//                            if (dataObjectType.equals("float")) {
+//                                dataObjectDecimal = forEachData.getDouble("float_value");
+//                                cityDetailsData.add(new CityDetailsData(scoreDetailLabel,dataObjectName,dataObjectType,dataObjectDecimal)); //put each value in an array element, equivalent to one jsonobject
+//                            }
+//                            if (dataObjectType.equals("percent")) {
+//                                dataObjectDecimal = forEachData.getDouble("percent_value");
+//                                cityDetailsData.add(new CityDetailsData(scoreDetailLabel,dataObjectName,dataObjectType,dataObjectDecimal));
+//                            }
+//                            if (dataObjectType.equals("currency_dollar")) {
+//                                dataObjectDecimal = forEachData.getDouble("currency_dollar_value");
+//                                cityDetailsData.add(new CityDetailsData(scoreDetailLabel,dataObjectName,dataObjectType,dataObjectDecimal));
+//                            }
+//                            if (dataObjectType.equals("string")) {
+//                                dataObjectString = forEachData.getString("string_value");
+//                                cityDetailsData.add(new CityDetailsData(scoreDetailLabel,dataObjectName,dataObjectType,dataObjectString));
+//                            }
+//                            if (dataObjectType.equals("url")) {
+//                                dataObjectString = forEachData.getString("url_value");
+//                                cityDetailsData.add(new CityDetailsData(scoreDetailLabel,dataObjectName,dataObjectType,dataObjectString));
+//
+//                            }
+//                            if (dataObjectType.equals("int")) {
+//                                dataObjectInt = forEachData.getInt("int_value");
+//                                cityDetailsData.add(new CityDetailsData(scoreDetailLabel,dataObjectName,dataObjectType,dataObjectInt));
+//                            }
+//
+//                        }
+//                        cityDetails.add(new CityDetails(scoreDetailLabel,cityDetailsData)); //no output
+//                    }
+//
+//                } catch (JSONException e) {
+//                    e.printStackTrace();
+//                }
+//
+//                view.setCityDetails(cityDetails, cityName);
+//            }
+//
+//            @Override
+//            public void onError(VolleyError error) {
+//
+//            }
+//        });
 
-                ArrayList<CityDetails> cityDetails = new ArrayList<>();
-                ArrayList<CityDetailsData> cityDetailsData = new ArrayList<>();
+        controller.getCityDetails(cityName, data -> {
+            EntityResponse response = (EntityResponse) data;
+            CategoriesEntity[] categories = response.categories;
+            ArrayList<CityDetails> cityDetails = new ArrayList<>();
+            ArrayList<CityDetailsData> cityDetailsData = new ArrayList<>();
 
-                try {
-                    categories = jsonObject.getJSONArray("categories");
-                    for (int i=0;i<categories.length();i++) {
-                        forEachScore = categories.getJSONObject(i); //get each score
-                        scoreDetailLabel = forEachScore.getString("label"); //get each score name
+            for (CategoriesEntity category: categories) {
+                String scoreDetailLabel = category.label;
+                Entity[] scores = category.data;
 
-                        data = forEachScore.getJSONArray("data"); //get data array
-                        for (int j=0;j<data.length();j++) { //scan through data array
-                            forEachData = data.getJSONObject(j); //declare array element object
-                            dataObjectName = forEachData.getString("label");
-                            dataObjectType = forEachData.getString("type");
-                            if (dataObjectType.equals("float")) {
-                                dataObjectDecimal = forEachData.getDouble("float_value");
-                                cityDetailsData.add(new CityDetailsData(scoreDetailLabel,dataObjectName,dataObjectType,dataObjectDecimal)); //put each value in an array element, equivalent to one jsonobject
-                            }
-                            if (dataObjectType.equals("percent")) {
-                                dataObjectDecimal = forEachData.getDouble("percent_value");
-                                cityDetailsData.add(new CityDetailsData(scoreDetailLabel,dataObjectName,dataObjectType,dataObjectDecimal));
-                            }
-                            if (dataObjectType.equals("currency_dollar")) {
-                                dataObjectDecimal = forEachData.getDouble("currency_dollar_value");
-                                cityDetailsData.add(new CityDetailsData(scoreDetailLabel,dataObjectName,dataObjectType,dataObjectDecimal));
-                            }
-                            if (dataObjectType.equals("string")) {
-                                dataObjectString = forEachData.getString("string_value");
-                                cityDetailsData.add(new CityDetailsData(scoreDetailLabel,dataObjectName,dataObjectType,dataObjectString));
-                            }
-                            if (dataObjectType.equals("url")) {
-                                dataObjectString = forEachData.getString("url_value");
-                                cityDetailsData.add(new CityDetailsData(scoreDetailLabel,dataObjectName,dataObjectType,dataObjectString));
+                for (Entity score: scores) {
+                    String scoreName = score.label;
+                    String scoreType = score.type;
+                    String scoreValue;
 
-                            }
-                            if (dataObjectType.equals("int")) {
-                                dataObjectInt = forEachData.getInt("int_value");
-                                cityDetailsData.add(new CityDetailsData(scoreDetailLabel,dataObjectName,dataObjectType,dataObjectInt));
-                            }
-
-                        }
-                        cityDetails.add(new CityDetails(scoreDetailLabel,cityDetailsData)); //no output
+                    switch (scoreType) {
+                        case "float":
+                            scoreValue = String.valueOf(score.detailFloatValue);
+                            cityDetailsData.add(new CityDetailsData(scoreDetailLabel,scoreName,scoreType,scoreValue));
+                            break;
+                        case "percent":
+                            scoreValue = String.valueOf(score.detailPercentValue);
+                            cityDetailsData.add(new CityDetailsData(scoreDetailLabel,scoreName,scoreType,scoreValue));
+                            break;
+                        case "currency_dollar":
+                            scoreValue = String.valueOf(score.detailCurrencyDollarValue);
+                            cityDetailsData.add(new CityDetailsData(scoreDetailLabel,scoreName,scoreType,scoreValue));
+                            break;
+                        case "string":
+                            scoreValue = score.detailStringValue;
+                            cityDetailsData.add(new CityDetailsData(scoreDetailLabel,scoreName,scoreType,scoreValue));
+                            break;
+                        case "url":
+                            scoreValue = score.detailUrlValue;
+                            cityDetailsData.add(new CityDetailsData(scoreDetailLabel,scoreName,scoreType,scoreValue));
+                            break;
+                        case "int":
+                            scoreValue = String.valueOf(score.detailIntValue);
+                            cityDetailsData.add(new CityDetailsData(scoreDetailLabel,scoreName,scoreType,scoreValue));
+                            break;
                     }
-
-                } catch (JSONException e) {
-                    e.printStackTrace();
                 }
-
-                view.setCityDetails(cityDetails, cityName);
+                cityDetails.add(new CityDetails(scoreDetailLabel,cityDetailsData));
             }
 
-            @Override
-            public void onError(VolleyError error) {
-
-            }
+            view.setCityDetails(cityDetails, cityName);
         });
 
         cityScannerService.getScanResultsSalaries(cityName, new VolleyListeners.VolleyJSONResponseListener() {
@@ -330,6 +379,55 @@ public class CityScannerPresenter implements CityScannerContract.Presenter {
 
             view.setBasicInfo(outputInfo);
         });
+
+        controller.getCityDetails(cityName, data -> {
+            EntityResponse response = (EntityResponse) data;
+            CategoriesEntity[] categories = response.categories;
+            ArrayList<CityDetails> cityDetails = new ArrayList<>();
+            ArrayList<CityDetailsData> cityDetailsData = new ArrayList<>();
+
+            for (CategoriesEntity category: categories) {
+                String scoreDetailLabel = category.label;
+                Entity[] scores = category.data;
+
+                for (Entity score: scores) {
+                    String scoreName = score.label;
+                    String scoreType = score.type;
+                    String scoreValue;
+
+                    switch (scoreType) {
+                        case "float":
+                            scoreValue = String.valueOf(score.detailFloatValue);
+                            cityDetailsData.add(new CityDetailsData(scoreDetailLabel,scoreName,scoreType,scoreValue));
+                            break;
+                        case "percent":
+                            scoreValue = String.valueOf(score.detailPercentValue);
+                            cityDetailsData.add(new CityDetailsData(scoreDetailLabel,scoreName,scoreType,scoreValue));
+                            break;
+                        case "currency_dollar":
+                            scoreValue = String.valueOf(score.detailCurrencyDollarValue);
+                            cityDetailsData.add(new CityDetailsData(scoreDetailLabel,scoreName,scoreType,scoreValue));
+                            break;
+                        case "string":
+                            scoreValue = score.detailStringValue;
+                            cityDetailsData.add(new CityDetailsData(scoreDetailLabel,scoreName,scoreType,scoreValue));
+                            break;
+                        case "url":
+                            scoreValue = score.detailUrlValue;
+                            cityDetailsData.add(new CityDetailsData(scoreDetailLabel,scoreName,scoreType,scoreValue));
+                            break;
+                        case "int":
+                            scoreValue = String.valueOf(score.detailIntValue);
+                            cityDetailsData.add(new CityDetailsData(scoreDetailLabel,scoreName,scoreType,scoreValue));
+                            break;
+                    }
+                }
+                cityDetails.add(new CityDetails(scoreDetailLabel,cityDetailsData));
+            }
+
+            view.setCityDetails(cityDetails, cityName);
+        });
+
     }
 
     @Override
@@ -389,4 +487,57 @@ public class CityScannerPresenter implements CityScannerContract.Presenter {
         });
     }
 
+    @Override
+    public void getScanResultsScoresRetrofit(List<CityDetails> cityDetails, String cityName) {
+        controller.getCityScores(cityName, data -> {
+            EntityResponse response = (EntityResponse) data;
+            double teleportCityScore = 0;
+            String summary = response.cityScoreSummary;
+            CategoriesEntity[] categories = response.categories;
+            ArrayList<CityScore> scores = new ArrayList<>();
+
+            for (CategoriesEntity category: categories) {
+                String scoreName = category.name;
+                double scoreOutOf10 = category.scoreOutOf10;
+                String scoreColor = category.color;
+
+                scores.add(new CityScore(scoreName, (int) scoreOutOf10,scoreColor));
+            }
+
+            String summaryResult = "Summary: " + summary;
+            String summaryString = String.valueOf(HtmlCompat.fromHtml(summaryResult,0));
+
+            double roundedScore =  Math.round(teleportCityScore*100.0)/100.0;
+            String scoreString = "Teleport City Score: " + roundedScore;
+
+            view.setCitySummaryAndTeleportScore(summaryString, scoreString);
+
+
+            ArrayList<CityScore> newCityScore = new ArrayList<>();
+
+//            for (int i=0;i<scores.size();i++) {
+//                String name = scores.get(i).getName();
+//                int scoreValue = scores.get(i).getScore();
+//                String color = scores.get(i).getColor();
+//                for (int j=0;j<cityDetails.size();j++) {
+//                    if (cityDetails.get(j).getCityDetailsName().equals(name)) {
+//                        newCityScore.add(new CityScore(name,scoreValue,color,cityDetails.get(j)));
+//                    }
+//                }
+//            }
+
+            for (CityScore score: scores) {
+                String name = score.getName();
+                int scoreValue = score.getScore();
+                String color = score.getColor();
+                for (CityDetails cityDetail: cityDetails) {
+                    if (cityDetail.getCityDetailsName().equals(name)) {
+                        newCityScore.add(new CityScore(name,scoreValue,color,cityDetail));
+                    }
+                }
+            }
+
+            view.setCityScores(newCityScore);
+        });
+    }
 }

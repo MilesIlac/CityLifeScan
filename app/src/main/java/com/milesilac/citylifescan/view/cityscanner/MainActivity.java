@@ -152,7 +152,7 @@ public class MainActivity extends AppCompatActivity implements CityScannerContra
     }
     @Override
     public void setCityDetails(List<CityDetails> cityDetails, String cityName) {
-        presenter.getScanResultsScores(cityDetails, cityName);
+        presenter.getScanResultsScoresRetrofit(cityDetails, cityName);
     }
 
     public void setCitySummaryAndTeleportScore(String summary, String teleportScore) {

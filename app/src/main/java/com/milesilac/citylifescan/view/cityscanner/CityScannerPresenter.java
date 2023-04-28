@@ -6,6 +6,7 @@ import androidx.core.text.HtmlCompat;
 import com.android.volley.VolleyError;
 import com.milesilac.citylifescan.model.Entity;
 import com.milesilac.citylifescan.model.EntityResponse;
+import com.milesilac.citylifescan.model.PhotosEntity;
 import com.milesilac.citylifescan.network.CityScanController;
 import com.milesilac.citylifescan.network.CityScannerService;
 import com.milesilac.citylifescan.network.RetrofitListeners;
@@ -74,68 +75,74 @@ public class CityScannerPresenter implements CityScannerContract.Presenter {
 
     @Override
     public void checkCityNameRetrofit() {
-        controller.getAllUrbanAreas(new RetrofitListeners.AllUrbanAreasResponseListener() {
-            @Override
-            public void onResponse(Object data) {
-                EntityResponse entity = (EntityResponse) data;
-                ArrayList<String> names = new ArrayList<>();
+        controller.getAllUrbanAreas(data -> {
+            EntityResponse response = (EntityResponse) data;
+            Entity[] uaItems = response._links.uaItem;
 
-                Entity[] uaItems = entity._links.uaItem;
-                for (Entity uaItem : uaItems) {
-                    names.add(uaItem.name);
-                }
-
-                String[] countryNames = new String[names.size()];
-                for (int i=0;i<names.size();i++) {
-                    countryNames[i] = names.get(i);
-                }
-
-                view.populateCityNames(countryNames);
-
+            String[] countryNames = new String[uaItems.length];
+            for (int i = 0, size = uaItems.length ; i < size ; i++) {
+                countryNames[i] = uaItems[i].name;
             }
+
+            view.populateCityNames(countryNames);
         });
     }
 
     @Override
     public void getScanResults(String cityName) {
 
-        cityScannerService.getScanResultsImage(cityName, new VolleyListeners.VolleyJSONResponseListener() {
-            @Override
-            public void onResponse(JSONObject jsonObject) {
-                JSONArray photos;
-                JSONObject image;
-                JSONObject attribution;
-                String imageURL = "";
-                String photographer = "";
-                String source = "";
-                String site = "";
-                String license = "";
+//        cityScannerService.getScanResultsImage(cityName, new VolleyListeners.VolleyJSONResponseListener() {
+//            @Override
+//            public void onResponse(JSONObject jsonObject) {
+//                JSONArray photos;
+//                JSONObject image;
+//                JSONObject attribution;
+//                String imageURL = "";
+//                String photographer = "";
+//                String source = "";
+//                String site = "";
+//                String license = "";
+//
+//                try {
+//                    photos = jsonObject.getJSONArray("photos");
+//                    JSONObject getImage = photos.getJSONObject(0);
+//                    //get image
+//                    image = getImage.getJSONObject("image");
+//                    imageURL = image.getString("mobile");
+//                    //get attribution details
+//                    attribution = getImage.getJSONObject("attribution");
+//                    photographer = attribution.getString("photographer");
+//                    source = attribution.getString("source");
+//                    site = attribution.getString("site");
+//                    license =attribution.getString("license");
+//
+//                } catch (JSONException e) {
+//                    e.printStackTrace();
+//                }
+//
+//                view.setImageData(imageURL,photographer,source,site,license);
+//            }
+//
+//            @Override
+//            public void onError(VolleyError error) {
+//
+//            }
+//
+//        });
 
-                try {
-                    photos = jsonObject.getJSONArray("photos");
-                    JSONObject getImage = photos.getJSONObject(0);
-                    //get image
-                    image = getImage.getJSONObject("image");
-                    imageURL = image.getString("mobile");
-                    //get attribution details
-                    attribution = getImage.getJSONObject("attribution");
-                    photographer = attribution.getString("photographer");
-                    source = attribution.getString("source");
-                    site = attribution.getString("site");
-                    license =attribution.getString("license");
+        controller.getCityImageDetails(cityName, data -> {
+            EntityResponse response = (EntityResponse) data;
+            PhotosEntity[] photos = response.photos;
 
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
+            Entity attribution = photos[0].attribution;
+            String license = attribution.license;
+            String photographer = attribution.photographer;
+            String site = attribution.site;
+            String source = attribution.source;
 
-                view.setImageData(imageURL,photographer,source,site,license);
-            }
+            String imageUrl = photos[0].image.imageUrl;
 
-            @Override
-            public void onError(VolleyError error) {
-
-            }
-
+            view.setImageData(imageUrl,photographer,source,site,license);
         });
 
         cityScannerService.getScanResultsBasicInfo(cityName, new VolleyListeners.VolleyJSONResponseListener() {
@@ -280,6 +287,24 @@ public class CityScannerPresenter implements CityScannerContract.Presenter {
             }
         });
 
+    }
+
+    @Override
+    public void getScanResultsRetrofit(String cityName) {
+        controller.getCityImageDetails(cityName, data -> {
+            EntityResponse response = (EntityResponse) data;
+            PhotosEntity[] photos = response.photos;
+
+            Entity attribution = photos[0].attribution;
+            String license = attribution.license;
+            String photographer = attribution.photographer;
+            String site = attribution.site;
+            String source = attribution.source;
+
+            String imageUrl = photos[0].image.imageUrl;
+
+            view.setImageData(imageUrl,photographer,source,site,license);
+        });
     }
 
     @Override

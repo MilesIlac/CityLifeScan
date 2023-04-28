@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.milesilac.citylifescan.StringUtils;
 import com.milesilac.citylifescan.model.EntityResponse;
 
 import java.util.concurrent.TimeUnit;
@@ -37,17 +38,40 @@ public class CityScanController {
 
     CityScanService cityScanService = retrofit.create(CityScanService.class);
 
-    public void getAllUrbanAreas(RetrofitListeners.AllUrbanAreasResponseListener listener) {
+    public void getAllUrbanAreas(RetrofitListeners.EntityResponseListener listener) {
         Call<EntityResponse> call =  cityScanService.getAllUrbanAreas();
         call.enqueue(new Callback<EntityResponse>() {
             @Override
             public void onResponse(@NonNull Call<EntityResponse> call, @NonNull Response<EntityResponse> response) {
                 if (listener != null) {
-                    if (response.body() != null) {
-
-                        listener.onResponse(response.body());
+                    if (response.isSuccessful()) {
+                        EntityResponse body = response.body();
+                        if (body != null) {
+                            listener.onResponse(body);
+                        }
                     }
+                }
+            }
 
+            @Override
+            public void onFailure(@NonNull Call<EntityResponse> call, @NonNull Throwable t) {
+
+            }
+        });
+    }
+
+    public void getCityImageDetails(String cityName, RetrofitListeners.EntityResponseListener listener) {
+        Call<EntityResponse> call = cityScanService.getCityImageDetails(StringUtils.formatCityName(cityName));
+        call.enqueue(new Callback<EntityResponse>() {
+            @Override
+            public void onResponse(@NonNull Call<EntityResponse> call, @NonNull Response<EntityResponse> response) {
+                if (listener != null) {
+                    if (response.isSuccessful()) {
+                        EntityResponse body = response.body();
+                        if (body != null) {
+                            listener.onResponse(body);
+                        }
+                    }
                 }
             }
 

@@ -1,5 +1,6 @@
 package com.milesilac.citylifescan.network;
 
+
 import com.milesilac.citylifescan.model.EntityResponse;
 
 import retrofit2.Call;

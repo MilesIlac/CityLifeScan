@@ -23,4 +23,7 @@ public interface CityScanService {
 
     @GET("api/urban_areas/slug:{cityName}/scores/")
     Call<EntityResponse> getCityScores(@Path("cityName") String cityName);
+
+    @GET("api/urban_areas/slug:{cityName}/salaries/")
+    Call<EntityResponse> getCitySalaries(@Path("cityName") String cityName);
 }

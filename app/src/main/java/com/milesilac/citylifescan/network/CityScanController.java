@@ -147,4 +147,26 @@ public class CityScanController {
             }
         });
     }
+
+    public void getCitySalaries(String cityName, RetrofitListeners.EntityResponseListener listener) {
+        Call<EntityResponse> call = cityScanService.getCitySalaries(StringUtils.formatCityName(cityName));
+        call.enqueue(new Callback<EntityResponse>() {
+            @Override
+            public void onResponse(@NonNull Call<EntityResponse> call, @NonNull Response<EntityResponse> response) {
+                if (listener != null) {
+                    if (response.isSuccessful()) {
+                        EntityResponse body = response.body();
+                        if (body != null) {
+                            listener.onResponse(body);
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<EntityResponse> call, @NonNull Throwable t) {
+
+            }
+        });
+    }
 }

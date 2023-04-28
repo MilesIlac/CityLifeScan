@@ -23,8 +23,6 @@ import com.anychart.chart.common.dataentry.DataEntry;
 import com.anychart.charts.Pyramid;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.engine.DiskCacheStrategy;
-import com.bumptech.glide.request.RequestOptions;
 import com.milesilac.citylifescan.model.CityDetails;
 import com.milesilac.citylifescan.model.CitySalaries;
 import com.milesilac.citylifescan.model.CityScore;
@@ -125,17 +123,11 @@ public class MainActivity extends AppCompatActivity implements CityScannerContra
     public void setImageData(String imageUrl, String photographer, String source, String site, String license) {
         Glide.with(this)
              .load(imageUrl)
-             .apply(new RequestOptions()
-                     .timeout(10000)
-                     .diskCacheStrategy(DiskCacheStrategy.ALL))
              .into(binding.photo);
 
         Glide.with(this)
-                .load(imageUrl)
-                .apply(new RequestOptions()
-                        .timeout(10000)
-                        .diskCacheStrategy(DiskCacheStrategy.ALL))
-                .into(networkImageViewZoomed);
+             .load(imageUrl)
+             .into(networkImageViewZoomed);
 
         String personAndSite = photographer + "@" + site;
         SpannableString string = new SpannableString(personAndSite);

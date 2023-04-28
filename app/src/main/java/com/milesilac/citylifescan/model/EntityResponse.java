@@ -4,7 +4,9 @@ import androidx.annotation.NonNull;
 
 import com.google.gson.Gson;
 
-public class EntityResponse {
+public class EntityResponse extends BaseEntityResponse {
+
+    public int count;
 
     @NonNull
     @Override

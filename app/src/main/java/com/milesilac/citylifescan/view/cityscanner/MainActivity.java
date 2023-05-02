@@ -3,20 +3,15 @@ package com.milesilac.citylifescan.view.cityscanner;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
-import android.app.Dialog;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.TextWatcher;
-import android.text.method.LinkMovementMethod;
 import android.text.style.URLSpan;
 import android.view.View;
-import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.ImageView;
-import android.widget.TextView;
 
 import com.anychart.AnyChart;
 import com.anychart.chart.common.dataentry.DataEntry;
@@ -28,19 +23,18 @@ import com.milesilac.citylifescan.model.CitySalaries;
 import com.milesilac.citylifescan.model.CityScore;
 import com.milesilac.citylifescan.R;
 import com.milesilac.citylifescan.databinding.ActivityMainBinding;
+import com.milesilac.citylifescan.view.CityPhotoDialogFragment;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements CityScannerContract.View {
 
-    TextView imagePhotographer, imageAttribution;
-    ImageView networkImageViewZoomed;
-    Dialog photoZoomed;
-
     public static final String SHOW_MEDIAN_SALARY = "MEDIAN SALARY: $";
 
     private ActivityMainBinding binding;
+
+    private CityPhotoDialogFragment dialogFragment;
     private ScoreRecViewAdapter scoreRecViewAdapter;
     Pyramid pyramid;
 
@@ -60,17 +54,6 @@ public class MainActivity extends AppCompatActivity implements CityScannerContra
         presenter = new CityScannerPresenter(this);
 
         presenter.checkCityName();
-
-        //setup networkImageView dialog
-        photoZoomed = new Dialog(this);
-        photoZoomed.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        photoZoomed.setContentView(R.layout.image_view_dialog);
-        photoZoomed.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
-        photoZoomed.setCancelable(true);
-
-        networkImageViewZoomed = photoZoomed.findViewById(R.id.photoZoomed);
-        imagePhotographer = photoZoomed.findViewById(R.id.imagePhotographer);
-        imageAttribution = photoZoomed.findViewById(R.id.imageAttribution);
 
         setupScoresAdapter();
         setupPyramidChart();
@@ -109,7 +92,6 @@ public class MainActivity extends AppCompatActivity implements CityScannerContra
             binding.scoresCard.setVisibility(View.VISIBLE);
             binding.pyramidChartCard.setVisibility(View.VISIBLE);
         }
-
     }
 
     @Override
@@ -125,18 +107,12 @@ public class MainActivity extends AppCompatActivity implements CityScannerContra
              .load(imageUrl)
              .into(binding.photo);
 
-        Glide.with(this)
-             .load(imageUrl)
-             .into(networkImageViewZoomed);
-
         String personAndSite = photographer + "@" + site;
         SpannableString string = new SpannableString(personAndSite);
         int index = personAndSite.indexOf("@");
         string.setSpan(new URLSpan(source), index+1, personAndSite.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-        imagePhotographer.setText(string);
-        imagePhotographer.setMovementMethod(LinkMovementMethod.getInstance());
 
-        imageAttribution.setText(license);
+        dialogFragment = new CityPhotoDialogFragment(imageUrl, string, license);
 
         isImageDataSet = true;
         checkResponsesCompletion();
@@ -224,7 +200,8 @@ public class MainActivity extends AppCompatActivity implements CityScannerContra
     private void addEventListeners() {
         searchTextChangeListener();
         scanOnClickListener();
-        binding.photo.setOnClickListener(v -> photoZoomed.show());
+
+        binding.photo.setOnClickListener(v -> dialogFragment.show(getSupportFragmentManager(), null));
     }
 
     private void searchTextChangeListener() {

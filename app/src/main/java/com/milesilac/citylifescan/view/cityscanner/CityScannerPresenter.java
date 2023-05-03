@@ -1,6 +1,10 @@
 package com.milesilac.citylifescan.view.cityscanner;
 
 
+import android.text.SpannableString;
+import android.text.Spanned;
+import android.text.style.URLSpan;
+
 import androidx.core.text.HtmlCompat;
 
 import com.milesilac.citylifescan.model.CategoriesEntity;
@@ -59,7 +63,12 @@ public class CityScannerPresenter implements CityScannerContract.Presenter {
 
             String imageUrl = photos[0].image.imageUrl;
 
-            view.setImageData(imageUrl,photographer,source,site,license);
+            String photographerAndSite = photographer + "@" + site;
+            SpannableString string = new SpannableString(photographerAndSite);
+            int index = photographerAndSite.indexOf("@");
+            string.setSpan(new URLSpan(source), index+1, photographerAndSite.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+            view.setImageData(imageUrl,photographer,source,site,license,string);
         });
 
         controller.getCitySummary(cityName, data -> {

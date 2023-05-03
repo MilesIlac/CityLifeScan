@@ -6,9 +6,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.SpannableString;
-import android.text.Spanned;
 import android.text.TextWatcher;
-import android.text.style.URLSpan;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -85,6 +83,12 @@ public class MainActivity extends AppCompatActivity implements CityScannerContra
         binding.basicInfoCard.setVisibility(View.INVISIBLE);
         binding.scoresCard.setVisibility(View.INVISIBLE);
         binding.pyramidChartCard.setVisibility(View.INVISIBLE);
+
+        isImageDataSet = false;
+        isBasicInfoSet = false;
+        isCitySummaryAndTeleportScoreSet = false;
+        isCityScoresSet = false;
+        isCitySalariesDataSet = false;
     }
 
     private void checkResponsesCompletion() {
@@ -104,17 +108,12 @@ public class MainActivity extends AppCompatActivity implements CityScannerContra
     }
 
     @Override
-    public void setImageData(String imageUrl, String photographer, String source, String site, String license) {
+    public void setImageData(String imageUrl, String photographer, String source, String site, String license, SpannableString photographerAndSite) {
         Glide.with(this)
              .load(imageUrl)
              .into(binding.photo);
 
-        String personAndSite = photographer + "@" + site;
-        SpannableString string = new SpannableString(personAndSite);
-        int index = personAndSite.indexOf("@");
-        string.setSpan(new URLSpan(source), index+1, personAndSite.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-
-        dialogFragment.setImageDetails(imageUrl, string, license);
+        dialogFragment.setImageDetails(imageUrl, photographerAndSite, license);
 
         isImageDataSet = true;
         checkResponsesCompletion();
@@ -228,13 +227,6 @@ public class MainActivity extends AppCompatActivity implements CityScannerContra
     private void scanOnClickListener() {
         binding.btnScan.setOnClickListener(v -> {
             emptyScreenInit();
-
-            isImageDataSet = false;
-            isBasicInfoSet = false;
-            isCitySummaryAndTeleportScoreSet = false;
-            isCityScoresSet = false;
-            isCitySalariesDataSet = false;
-
             presenter.getScanResults(binding.inputCity.getText().toString());
         });
     }

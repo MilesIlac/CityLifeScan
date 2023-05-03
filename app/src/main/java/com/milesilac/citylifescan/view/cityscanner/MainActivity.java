@@ -55,6 +55,8 @@ public class MainActivity extends AppCompatActivity implements CityScannerContra
 
         presenter.checkCityName();
 
+        dialogFragment = new CityPhotoDialogFragment();
+
         setupScoresAdapter();
         setupPyramidChart();
         addEventListeners();
@@ -112,7 +114,7 @@ public class MainActivity extends AppCompatActivity implements CityScannerContra
         int index = personAndSite.indexOf("@");
         string.setSpan(new URLSpan(source), index+1, personAndSite.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
 
-        dialogFragment = new CityPhotoDialogFragment(imageUrl, string, license);
+        dialogFragment.setImageDetails(imageUrl, string, license);
 
         isImageDataSet = true;
         checkResponsesCompletion();

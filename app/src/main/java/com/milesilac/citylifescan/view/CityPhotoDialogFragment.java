@@ -20,12 +20,6 @@ public class CityPhotoDialogFragment extends DialogFragment {
     SpannableString personAndSite;
     String license;
 
-    public CityPhotoDialogFragment(String imageUrl, SpannableString personAndSite, String license) {
-        this.imageUrl = imageUrl;
-        this.personAndSite = personAndSite;
-        this.license = license;
-    }
-
     @NonNull
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
@@ -50,6 +44,12 @@ public class CityPhotoDialogFragment extends DialogFragment {
         binding.imagePhotographer.setMovementMethod(LinkMovementMethod.getInstance());
 
         binding.imageAttribution.setText(license);
+    }
+
+    public void setImageDetails(String imageUrl, SpannableString personAndSite, String license) {
+        this.imageUrl = imageUrl;
+        this.personAndSite = personAndSite;
+        this.license = license;
     }
 
 }

@@ -41,33 +41,30 @@ public class CityScanController {
         });
     }
 
-    public void getAllUrbanAreas(RetrofitListeners.EntityResponseListener listener) {
-        Call<EntityResponse> call =  cityScanService.getAllUrbanAreas();
-        enqueueCall(call, listener);
-    }
-
-    public void getCityImageDetails(String cityName, RetrofitListeners.EntityResponseListener listener) {
-        Call<EntityResponse> call = cityScanService.getCityImageDetails(StringUtils.formatCityName(cityName));
-        enqueueCall(call, listener);
-    }
-
-    public void getCitySummary(String cityName, RetrofitListeners.EntityResponseListener listener) {
-        Call<EntityResponse> call = cityScanService.getCitySummary(StringUtils.formatCityName(cityName));
-        enqueueCall(call, listener);
-    }
-
-    public void getCityDetails(String cityName, RetrofitListeners.EntityResponseListener listener) {
-        Call<EntityResponse> call = cityScanService.getCityDetails(StringUtils.formatCityName(cityName));
-        enqueueCall(call, listener);
-    }
-
-    public void getCityScores(String cityName, RetrofitListeners.EntityResponseListener listener) {
-        Call<EntityResponse> call = cityScanService.getCityScores(StringUtils.formatCityName(cityName));
-        enqueueCall(call, listener);
-    }
-
-    public void getCitySalaries(String cityName, RetrofitListeners.EntityResponseListener listener) {
-        Call<EntityResponse> call = cityScanService.getCitySalaries(StringUtils.formatCityName(cityName));
-        enqueueCall(call, listener);
+    public void scan(String cityName, RetrofitListeners.EntityResponseListener listener, String requestType) {
+        Call<EntityResponse> call = null;
+        switch (requestType) {
+            case "allUrbanAreas":
+                call =  cityScanService.getAllUrbanAreas();
+                break;
+            case "imageDetails":
+                call =  cityScanService.getCityImageDetails(StringUtils.formatCityName(cityName));
+                break;
+            case "summary":
+                call =  cityScanService.getCitySummary(StringUtils.formatCityName(cityName));
+                break;
+            case "details":
+                call =  cityScanService.getCityDetails(StringUtils.formatCityName(cityName));
+                break;
+            case "scores":
+                call =  cityScanService.getCityScores(StringUtils.formatCityName(cityName));
+                break;
+            case "salaries":
+                call =  cityScanService.getCitySalaries(StringUtils.formatCityName(cityName));
+                break;
+        }
+        if (call != null) {
+            enqueueCall(call, listener);
+        }
     }
 }

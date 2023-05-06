@@ -1,6 +1,13 @@
 package com.milesilac.citylifescan.view.cityscanner;
 
 
+import static com.milesilac.citylifescan.StringUtils.ALL_URBAN_AREAS;
+import static com.milesilac.citylifescan.StringUtils.CITY_DETAILS;
+import static com.milesilac.citylifescan.StringUtils.CITY_IMAGE_DETAILS;
+import static com.milesilac.citylifescan.StringUtils.CITY_SALARIES;
+import static com.milesilac.citylifescan.StringUtils.CITY_SCORES;
+import static com.milesilac.citylifescan.StringUtils.CITY_SUMMARY;
+
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.style.URLSpan;
@@ -35,7 +42,7 @@ public class CityScannerPresenter implements CityScannerContract.Presenter {
 
     @Override
     public void checkCityName() {
-        controller.getAllUrbanAreas(data -> {
+        controller.scan("", data -> {
             EntityResponse response = (EntityResponse) data;
             Entity[] uaItems = response._links.uaItem;
 
@@ -45,13 +52,12 @@ public class CityScannerPresenter implements CityScannerContract.Presenter {
             }
 
             view.populateCityNames(countryNames);
-        });
+        }, ALL_URBAN_AREAS);
     }
 
     @Override
     public void getScanResults(String cityName) {
-
-        controller.getCityImageDetails(cityName, data -> {
+        controller.scan(cityName, data -> {
             EntityResponse response = (EntityResponse) data;
             PhotosEntity[] photos = response.photos;
 
@@ -69,9 +75,10 @@ public class CityScannerPresenter implements CityScannerContract.Presenter {
             string.setSpan(new URLSpan(source), index+1, photographerAndSite.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
 
             view.setImageData(imageUrl,photographer,source,site,license,string);
-        });
+        }, CITY_IMAGE_DETAILS);
 
-        controller.getCitySummary(cityName, data -> {
+
+        controller.scan(cityName, data -> {
             EntityResponse response = (EntityResponse) data;
             String fullName = response.fullName;
             String continent = response.continent;
@@ -82,9 +89,10 @@ public class CityScannerPresenter implements CityScannerContract.Presenter {
                     "Current Mayor: " + currentMayor + "\n";
 
             view.setBasicInfo(outputInfo);
-        });
+        }, CITY_SUMMARY);
 
-        controller.getCityDetails(cityName, data -> {
+
+        controller.scan(cityName, data -> {
             EntityResponse response = (EntityResponse) data;
             CategoriesEntity[] categories = response.categories;
             ArrayList<CityDetails> cityDetails = new ArrayList<>();
@@ -130,9 +138,10 @@ public class CityScannerPresenter implements CityScannerContract.Presenter {
             }
 
             view.setCityDetails(cityDetails, cityName);
-        });
+        }, CITY_DETAILS);
 
-        controller.getCitySalaries(cityName, data -> {
+
+        controller.scan(cityName, data -> {
             EntityResponse response = (EntityResponse) data;
             SalariesEntity[] salaries = response.salaries;
             ArrayList<CitySalaries> salaryData = new ArrayList<>();
@@ -147,12 +156,12 @@ public class CityScannerPresenter implements CityScannerContract.Presenter {
             }
 
             view.setCitySalariesData(salaryData);
-        });
+        }, CITY_SALARIES);
     }
 
     @Override
     public void getScanResultsScores(List<CityDetails> cityDetails, String cityName) {
-        controller.getCityScores(cityName, data -> {
+        controller.scan(cityName, data -> {
             EntityResponse response = (EntityResponse) data;
             double teleportCityScore = response.teleportCityScore;
             String summary = response.cityScoreSummary;
@@ -178,17 +187,6 @@ public class CityScannerPresenter implements CityScannerContract.Presenter {
 
             ArrayList<CityScore> newCityScore = new ArrayList<>();
 
-//            for (int i=0;i<scores.size();i++) {
-//                String name = scores.get(i).getName();
-//                int scoreValue = scores.get(i).getScore();
-//                String color = scores.get(i).getColor();
-//                for (int j=0;j<cityDetails.size();j++) {
-//                    if (cityDetails.get(j).getCityDetailsName().equals(name)) {
-//                        newCityScore.add(new CityScore(name,scoreValue,color,cityDetails.get(j)));
-//                    }
-//                }
-//            }
-
             for (CityScore score: scores) {
                 String name = score.getName();
                 int scoreValue = score.getScore();
@@ -201,7 +199,7 @@ public class CityScannerPresenter implements CityScannerContract.Presenter {
             }
 
             view.setCityScores(newCityScore);
-        });
+        }, CITY_SCORES);
     }
 
 }

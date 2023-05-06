@@ -12,6 +12,7 @@ public interface CityScannerContract {
 
     interface View {
         void populateCityNames(String[] countryNames);
+        void onPopulateCityNamesFailed();
         void setImageData(String imageUrl, String photographer, String source, String site, String license, SpannableString photographerAndSite);
         void setBasicInfo(String basicInfo);
         void setCityDetails(List<CityDetails> cityDetails, String cityName);

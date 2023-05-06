@@ -30,13 +30,17 @@ public class CityScanController {
                         if (body != null) {
                             listener.onResponse(body);
                         }
+                    } else {
+                        listener.onFailure();
                     }
                 }
             }
 
             @Override
             public void onFailure(@NonNull Call<EntityResponse> call, @NonNull Throwable t) {
-
+                if (listener != null) {
+                    listener.onFailure();
+                }
             }
         });
     }

@@ -4,5 +4,6 @@ public class RetrofitListeners {
 
     public interface EntityResponseListener {
         void onResponse(Object data);
+        void onFailure();
     }
 }

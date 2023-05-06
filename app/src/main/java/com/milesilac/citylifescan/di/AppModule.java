@@ -16,7 +16,7 @@ public class AppModule {
 
     @Provides
     @Singleton
-    public CityScanController bindController(CityScanService cityScanService) {
+    public CityScanController controller(CityScanService cityScanService) {
         return new CityScanController(cityScanService);
     }
 }

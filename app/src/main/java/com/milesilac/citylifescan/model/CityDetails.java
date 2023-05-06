@@ -4,8 +4,8 @@ import java.util.ArrayList;
 
 public class CityDetails {
 
-    String cityDetailsName;
-    ArrayList<CityDetailsData> cityDetailsData;
+    private String cityDetailsName;
+    private ArrayList<CityDetailsData> cityDetailsData;
 
     public CityDetails(String cityDetailsName, ArrayList<CityDetailsData> cityDetailsData) {
         this.cityDetailsName = cityDetailsName;

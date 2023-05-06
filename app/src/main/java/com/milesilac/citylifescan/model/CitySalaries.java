@@ -4,10 +4,10 @@ import androidx.annotation.NonNull;
 
 public class CitySalaries {
 
-    String title;
-    double percentile_25;
-    double percentile_50;
-    double percentile_75;
+    private String title;
+    private double percentile_25;
+    private double percentile_50;
+    private double percentile_75;
 
     public CitySalaries(String title, double percentile_25, double percentile_50, double percentile_75) {
         this.title = title;

@@ -3,10 +3,10 @@ package com.milesilac.citylifescan.model;
 
 public class CityScore {
 
-    String name;
-    int score;
-    String color;
-    CityDetails cityDetails;
+    private String name;
+    private int score;
+    private String color;
+    private CityDetails cityDetails;
 
     public CityScore(String name, int score, String color, CityDetails cityDetails) {
         this.name = name;

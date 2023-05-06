@@ -26,11 +26,11 @@ import java.util.List;
 public class CityScannerPresenter implements CityScannerContract.Presenter {
 
     CityScannerContract.View view;
+    CityScanController controller;
 
-    CityScanController controller = new CityScanController();
-
-    public CityScannerPresenter(CityScannerContract.View view) {
+    public CityScannerPresenter(CityScannerContract.View view, CityScanController controller) {
         this.view = view;
+        this.controller = controller;
     }
 
     @Override

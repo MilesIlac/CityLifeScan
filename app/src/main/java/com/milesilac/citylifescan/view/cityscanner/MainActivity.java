@@ -21,11 +21,17 @@ import com.milesilac.citylifescan.model.CitySalaries;
 import com.milesilac.citylifescan.model.CityScore;
 import com.milesilac.citylifescan.R;
 import com.milesilac.citylifescan.databinding.ActivityMainBinding;
+import com.milesilac.citylifescan.network.CityScanController;
 import com.milesilac.citylifescan.view.CityPhotoDialogFragment;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.inject.Inject;
+
+import dagger.hilt.android.AndroidEntryPoint;
+
+@AndroidEntryPoint
 public class MainActivity extends AppCompatActivity implements CityScannerContract.View {
 
     public static final String SHOW_MEDIAN_SALARY = "MEDIAN SALARY: $";
@@ -35,6 +41,9 @@ public class MainActivity extends AppCompatActivity implements CityScannerContra
     private CityPhotoDialogFragment dialogFragment;
     private ScoreRecViewAdapter scoreRecViewAdapter;
     Pyramid pyramid;
+
+    @Inject
+    CityScanController controller;
 
     private CityScannerContract.Presenter presenter;
     private boolean isImageDataSet = false;
@@ -49,7 +58,7 @@ public class MainActivity extends AppCompatActivity implements CityScannerContra
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        presenter = new CityScannerPresenter(this);
+        presenter = new CityScannerPresenter(this, controller);
 
         presenter.checkCityName();
 

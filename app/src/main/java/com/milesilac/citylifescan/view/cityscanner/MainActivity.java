@@ -114,6 +114,18 @@ public class MainActivity extends AppCompatActivity implements CityScannerContra
         ArrayAdapter<String> adapter = new ArrayAdapter<>(MainActivity.this, R.layout.autocomplete_layout, countryNames);
         binding.inputCity.setThreshold(1);
         binding.inputCity.setAdapter(adapter);
+
+        isPopulateCityNamesSuccessful(true);
+    }
+
+    @Override
+    public void onPopulateCityNamesFailed() {
+        isPopulateCityNamesSuccessful(false);
+    }
+
+    private void isPopulateCityNamesSuccessful(boolean success) {
+        binding.inputCity.setVisibility(success ? View.VISIBLE : View.GONE);
+        binding.btnInputCityLoadFailed.setVisibility(!success ? View.VISIBLE : View.GONE);
     }
 
     @Override
@@ -208,10 +220,19 @@ public class MainActivity extends AppCompatActivity implements CityScannerContra
     }
 
     private void addEventListeners() {
+        loadFailedClickListener();
         searchTextChangeListener();
         scanOnClickListener();
 
         binding.photo.setOnClickListener(v -> dialogFragment.show(getSupportFragmentManager(), null));
+    }
+
+    private void loadFailedClickListener() {
+        binding.btnInputCityLoadFailed.setOnClickListener(v -> {
+            if (presenter != null) {
+                presenter.checkCityName();
+            }
+        });
     }
 
     private void searchTextChangeListener() {

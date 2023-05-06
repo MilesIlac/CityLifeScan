@@ -6,4 +6,5 @@
     <string name="median_salary">MEDIAN SALARY:&#032;</string>
     <string name="input_city">Teleport City</string>
     <string name="btnScan">SCAN</string>
+    <string name="load_failed">Load failed. Please click to reload.</string>
 </resources>

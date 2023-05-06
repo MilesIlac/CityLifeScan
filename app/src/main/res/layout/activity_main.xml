@@ -222,6 +222,25 @@
         android:layout_marginTop="50dp"
         android:layout_marginBottom="20dp"/>
 
+    <Button
+        android:id="@+id/btnInputCityLoadFailed"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/outputScrollView"
+        android:text="@string/load_failed"
+        android:includeFontPadding="false"
+        android:textAllCaps="false"
+        android:textSize="14sp"
+        android:textColor="#181a1b"
+        android:maxLines="1"
+        android:backgroundTint="#93761e"
+        android:layout_marginTop="50dp"
+        android:layout_marginBottom="20dp"
+        android:visibility="gone"/>
+
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"

@@ -8,13 +8,6 @@ public class CityScore {
     String color;
     CityDetails cityDetails;
 
-    public CityScore(String name, int score, String color) {
-        this.name = name;
-        this.score = score;
-        this.color = color;
-    }
-
-
     public CityScore(String name, int score, String color, CityDetails cityDetails) {
         this.name = name;
         this.score = score;

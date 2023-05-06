@@ -173,8 +173,14 @@ public class CityScannerPresenter implements CityScannerContract.Presenter {
                 double scoreOutOf10 = category.scoreOutOf10;
                 String scoreColor = category.color;
 
-                scores.add(new CityScore(scoreName, (int) scoreOutOf10,scoreColor));
+                for (CityDetails cityDetail: cityDetails) {
+                    if (cityDetail.getCityDetailsName().equals(scoreName)) {
+                        scores.add(new CityScore(scoreName, (int) scoreOutOf10,scoreColor, cityDetail));
+                    }
+                }
             }
+
+            view.setCityScores(scores);
 
             String summaryResult = "Summary: " + summary;
             String summaryString = String.valueOf(HtmlCompat.fromHtml(summaryResult,0));
@@ -183,22 +189,6 @@ public class CityScannerPresenter implements CityScannerContract.Presenter {
             String scoreString = "Teleport City Score: " + roundedScore;
 
             view.setCitySummaryAndTeleportScore(summaryString, scoreString);
-
-
-            ArrayList<CityScore> newCityScore = new ArrayList<>();
-
-            for (CityScore score: scores) {
-                String name = score.getName();
-                int scoreValue = score.getScore();
-                String color = score.getColor();
-                for (CityDetails cityDetail: cityDetails) {
-                    if (cityDetail.getCityDetailsName().equals(name)) {
-                        newCityScore.add(new CityScore(name,scoreValue,color,cityDetail));
-                    }
-                }
-            }
-
-            view.setCityScores(newCityScore);
         }, CITY_SCORES);
     }
 

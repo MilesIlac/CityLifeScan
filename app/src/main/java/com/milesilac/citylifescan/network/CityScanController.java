@@ -5,8 +5,6 @@ import androidx.annotation.NonNull;
 import com.milesilac.citylifescan.StringUtils;
 import com.milesilac.citylifescan.model.EntityResponse;
 
-import javax.inject.Inject;
-
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -15,7 +13,6 @@ public class CityScanController {
 
     private final CityScanService cityScanService;
 
-    @Inject
     public CityScanController(CityScanService cityScanService) {
         this.cityScanService = cityScanService;
     }

@@ -46,11 +46,6 @@ public class MainActivity extends AppCompatActivity implements CityScannerContra
     CityScanController controller;
 
     private CityScannerContract.Presenter presenter;
-    private boolean isImageDataSet = false;
-    private boolean isBasicInfoSet = false;
-    private boolean isCitySummaryAndTeleportScoreSet = false;
-    private boolean isCityScoresSet = false;
-    private boolean isCitySalariesDataSet = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,7 +62,7 @@ public class MainActivity extends AppCompatActivity implements CityScannerContra
         setupScoresAdapter();
         setupPyramidChart();
         addEventListeners();
-        emptyScreenInit();
+        setAllFieldsVisibility(false);
 
     }
 
@@ -87,26 +82,16 @@ public class MainActivity extends AppCompatActivity implements CityScannerContra
         binding.pyramidChart.setChart(pyramid);
     }
 
-    private void emptyScreenInit() {
-        binding.imageCard.setVisibility(View.INVISIBLE);
-        binding.basicInfoCard.setVisibility(View.INVISIBLE);
-        binding.scoresCard.setVisibility(View.INVISIBLE);
-        binding.pyramidChartCard.setVisibility(View.INVISIBLE);
-
-        isImageDataSet = false;
-        isBasicInfoSet = false;
-        isCitySummaryAndTeleportScoreSet = false;
-        isCityScoresSet = false;
-        isCitySalariesDataSet = false;
+    private void setAllFieldsVisibility(boolean visible) {
+        binding.imageCard.setVisibility(visible ? View.VISIBLE : View.INVISIBLE);
+        binding.basicInfoCard.setVisibility(visible ? View.VISIBLE : View.INVISIBLE);
+        binding.scoresCard.setVisibility(visible ? View.VISIBLE : View.INVISIBLE);
+        binding.pyramidChartCard.setVisibility(visible ? View.VISIBLE : View.INVISIBLE);
     }
 
-    private void checkResponsesCompletion() {
-        if (isImageDataSet && isBasicInfoSet && isCitySummaryAndTeleportScoreSet && isCityScoresSet && isCitySalariesDataSet) {
-            binding.imageCard.setVisibility(View.VISIBLE);
-            binding.basicInfoCard.setVisibility(View.VISIBLE);
-            binding.scoresCard.setVisibility(View.VISIBLE);
-            binding.pyramidChartCard.setVisibility(View.VISIBLE);
-        }
+    @Override
+    public void viewResults() {
+        setAllFieldsVisibility(true);
     }
 
     @Override
@@ -136,16 +121,14 @@ public class MainActivity extends AppCompatActivity implements CityScannerContra
 
         dialogFragment.setImageDetails(imageUrl, photographerAndSite, license);
 
-        isImageDataSet = true;
-        checkResponsesCompletion();
+        presenter.setImageDataSet(true);
     }
 
     @Override
     public void setBasicInfo(String basicInfo) {
         binding.outputBasicInfo.setText(basicInfo);
 
-        isBasicInfoSet = true;
-        checkResponsesCompletion();
+        presenter.setBasicInfoSet(true);
     }
     @Override
     public void setCityDetails(List<CityDetails> cityDetails, String cityName) {
@@ -156,16 +139,14 @@ public class MainActivity extends AppCompatActivity implements CityScannerContra
         binding.outputSummary.setText(summary);
         binding.outputTeleportCityScore.setText(teleportScore);
 
-        isCitySummaryAndTeleportScoreSet = true;
-        checkResponsesCompletion();
+        presenter.setCitySummaryAndTeleportScoreSet(true);
     }
 
     @Override
     public void setCityScores(List<CityScore> cityScores) {
         scoreRecViewAdapter.setCityScoresList(cityScores);
 
-        isCityScoresSet = true;
-        checkResponsesCompletion();
+        presenter.setCityScoresSet(true);
     }
 
     @Override
@@ -180,8 +161,7 @@ public class MainActivity extends AppCompatActivity implements CityScannerContra
         binding.jobSpinner.setAdapter(adapter);
         setJobSpinnerListener(citySalaries);
 
-        isCitySalariesDataSet = true;
-        checkResponsesCompletion();
+        presenter.setCitySalariesDataSet(true);
     }
 
     private void setJobSpinnerListener(List<CitySalaries> citySalaries) {
@@ -256,8 +236,15 @@ public class MainActivity extends AppCompatActivity implements CityScannerContra
 
     private void scanOnClickListener() {
         binding.btnScan.setOnClickListener(v -> {
-            emptyScreenInit();
-            presenter.getScanResults(binding.inputCity.getText().toString());
+            if (presenter != null) {
+                presenter.setImageDataSet(false);
+                presenter.setBasicInfoSet(false);
+                presenter.setCitySummaryAndTeleportScoreSet(false);
+                presenter.setCityScoresSet(false);
+                presenter.setCitySalariesDataSet(false);
+                setAllFieldsVisibility(false);
+                presenter.getScanResults(binding.inputCity.getText().toString());
+            }
         });
     }
 

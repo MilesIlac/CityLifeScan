@@ -41,6 +41,12 @@ public class CityScannerPresenter implements CityScannerContract.Presenter {
         this.controller = controller;
     }
 
+    private boolean isImageDataSet = false;
+    private boolean isBasicInfoSet = false;
+    private boolean isCitySummaryAndTeleportScoreSet = false;
+    private boolean isCityScoresSet = false;
+    private boolean isCitySalariesDataSet = false;
+
     @Override
     public void checkCityName() {
         controller.scan("", new RetrofitListeners.EntityResponseListener() {
@@ -228,4 +234,39 @@ public class CityScannerPresenter implements CityScannerContract.Presenter {
         }, CITY_SCORES);
     }
 
+    @Override
+    public void setImageDataSet(boolean imageDataSet) {
+        isImageDataSet = imageDataSet;
+        checkResponsesCompletion();
+    }
+
+    @Override
+    public void setBasicInfoSet(boolean basicInfoSet) {
+        isBasicInfoSet = basicInfoSet;
+        checkResponsesCompletion();
+    }
+
+    @Override
+    public void setCitySummaryAndTeleportScoreSet(boolean citySummaryAndTeleportScoreSet) {
+        isCitySummaryAndTeleportScoreSet = citySummaryAndTeleportScoreSet;
+        checkResponsesCompletion();
+    }
+
+    @Override
+    public void setCityScoresSet(boolean cityScoresSet) {
+        isCityScoresSet = cityScoresSet;
+        checkResponsesCompletion();
+    }
+
+    @Override
+    public void setCitySalariesDataSet(boolean citySalariesDataSet) {
+        isCitySalariesDataSet = citySalariesDataSet;
+        checkResponsesCompletion();
+    }
+
+    private void checkResponsesCompletion() {
+        if (isImageDataSet && isBasicInfoSet && isCitySummaryAndTeleportScoreSet && isCityScoresSet && isCitySalariesDataSet) {
+            view.viewResults();
+        }
+    }
 }

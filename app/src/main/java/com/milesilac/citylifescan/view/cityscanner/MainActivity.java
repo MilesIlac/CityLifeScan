@@ -153,7 +153,7 @@ public class MainActivity extends AppCompatActivity implements CityScannerContra
     public void setCitySalariesData(List<CitySalaries> citySalaries) {
         String[] allJobTitles = new String[citySalaries.size()];
 
-        for (int i=0;i<citySalaries.size();i++) {
+        for (int i = 0, size = citySalaries.size() ; i < size ; i++) {
             allJobTitles[i] = citySalaries.get(i).getTitle();
         }
 

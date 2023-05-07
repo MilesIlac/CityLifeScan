@@ -1,5 +1,5 @@
 # CityLifeScan
-Any city's Quality of Life (QoL) data checker app made in Java, with Teleport API integration
+Teleport Cities' Quality of Life (QoL) data checker app, with Teleport API integration
 
 ## General Info
 * Currently made in Java (Kotlin version in the works)
@@ -7,6 +7,7 @@ Any city's Quality of Life (QoL) data checker app made in Java, with Teleport AP
 * Tools and libraries used: Hilt, Retrofit, Glide, Gson, AnyChart
 
 ## Features
+* Big thanks to [Teleport](https://developers.teleport.org/api/) for providing the API
 * Pre-loads a list of Teleport Cities under the hood. If loading fails, a button will appear for manual reloading
 * Upon choosing a Teleport City and pressing the Scan button, information about that Teleport City will load, and is scrollable.
 * Information includes:
